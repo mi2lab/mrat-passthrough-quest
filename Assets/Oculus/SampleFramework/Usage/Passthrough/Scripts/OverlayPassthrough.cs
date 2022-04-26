@@ -8,7 +8,7 @@ public class OverlayPassthrough : MonoBehaviour
 
     void Start()
     {
-        GameObject ovrCameraRig = GameObject.Find("/MixedRealityPlayspace/OVRCameraRig");
+        GameObject ovrCameraRig = GameObject.Find("OVRCameraRig");
         if (ovrCameraRig == null)
         {
             Debug.LogError("Scene does not contain an OVRCameraRig");
