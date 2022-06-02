@@ -32,7 +32,7 @@ public class ReplayerControl : MonoBehaviour
         }
     }
 
-    void UpdateAll()
+    public void UpdateAll()
     {
         UpdateText();
         UpdateReplayerId();
@@ -40,18 +40,24 @@ public class ReplayerControl : MonoBehaviour
 
     public void UpdateText()
     {
-        HeadPosInfo localInfo = replayer.GetReplayInfo(currentId);
         if (replayer.GetPlayListLength() == 0)
         {
+            currentId = 0;
             idText.text = "0 / 0";
+            endTimeText.text = "";
         }
         else
         {
-            idText.text = (localInfo.id + 1).ToString() + " / " + replayer.GetPlayListLength().ToString();
+            if (currentId >= replayer.GetPlayListLength())
+            {
+                currentId = replayer.GetPlayListLength() - 1;
+            }
+            HeadPosInfo localInfo = replayer.GetReplayInfo(currentId);
+            idText.text = (currentId + 1).ToString() + " / " + replayer.GetPlayListLength().ToString();
+            System.DateTime localDate = new System.DateTime((long)localInfo.endTime);
+            string endTime = localDate.ToString("G");
+            endTimeText.text = endTime;
         }
-        System.DateTime localDate = new System.DateTime((long)localInfo.endTime);
-        string endTime = localDate.ToString("G");
-        endTimeText.text = endTime;
     }
 
     public void UpdateReplayerId()

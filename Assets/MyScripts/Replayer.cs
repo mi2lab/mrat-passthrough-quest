@@ -10,7 +10,7 @@ public class Replayer : MonoBehaviour
 {
 
     public GameObject HeadPrefab;
-    private HeadPosSeriesList headPosRecordings = new HeadPosSeriesList();
+    //private HeadPosSeriesList headPosRecordings = new HeadPosSeriesList();
     private HeadPosSeries headPosRecording = new HeadPosSeries();
     private GameObject HeadObject;
     private Coroutine replayingCoroutine;
@@ -28,8 +28,7 @@ public class Replayer : MonoBehaviour
     private Coroutine replayingIndicatorCoroutine;
 
     public ReplayerControl control;
-
-    private DatabaseReference reference;
+    public RecordingDatabse database;
 
     public void SetCurrentId(int id)
     {
@@ -38,53 +37,17 @@ public class Replayer : MonoBehaviour
 
     public int GetPlayListLength()
     {
-        return headPosRecordings.headPosList.Count;
+        return database.headPosRecordings.headPosList.Count;
     }
 
     public HeadPosInfo GetReplayInfo(int id = 0)
     {
-        if (id >= headPosRecordings.headPosList.Count)
+        if (id >= database.headPosRecordings.headPosList.Count)
         {
             return new HeadPosInfo();
         }
-        HeadPosSeries localSeries = headPosRecordings.headPosList[id];
+        HeadPosSeries localSeries = database.headPosRecordings.headPosList[id];
         return localSeries.info;
-    }
-
-    public void UpdateHeadPosRecordingsLocal()
-    {
-        try
-        {
-            string headPosJson = System.IO.File.ReadAllText(Application.persistentDataPath + "/HeadPosData.json");
-            headPosRecordings = JsonUtility.FromJson<HeadPosSeriesList>(headPosJson);
-            control.UpdateText();
-        }
-        catch (System.IO.DirectoryNotFoundException dirEx)
-        {
-        }
-    }
-
-    public void UpdateHeadPosRecordingsOnline()
-    {
-        try
-        {
-            reference.Child("recordings")
-                .GetValueAsync().ContinueWithOnMainThread(task => {
-                    if (task.IsCompleted)
-                    {
-                        DataSnapshot snapshot = task.Result;
-                        System.IO.File.WriteAllText(Application.persistentDataPath + "/HeadPosData.json", snapshot.GetValue(false).ToString());
-                        UpdateHeadPosRecordingsLocal();
-                    }
-                    else if (task.IsFaulted)
-                    {
-                        Debug.Log("Download from Database failed");
-                    }
-                });
-        }
-        catch (System.IO.DirectoryNotFoundException dirEx)
-        {
-        }
     }
 
     IEnumerator ReplayingIndicatorCoroutine()
@@ -135,17 +98,39 @@ public class Replayer : MonoBehaviour
         yield return null;
     }
 
-    bool StartReplay()
+    public bool isReplaying()
+    {
+        return coroutineRunning;
+    }
+
+    public void UpdateReplayPanel()
+    {
+        control.UpdateAll();
+    }
+
+    public void UpdateReplay()
+    {
+        database.ReadOnline();
+        UpdateReplayPanel();
+    }
+
+    public void DeleteReplay()
+    {
+        database.Delete();
+        UpdateReplayPanel();
+    }
+
+    public bool StartReplay()
     {
         if (!coroutineRunning)
         {
             //string headPosJson = System.IO.File.ReadAllText(Application.persistentDataPath + "/HeadPosData.json");
             //headPosRecording = JsonUtility.FromJson<HeadPosSeries>(headPosJson);
-            if (currentId >= headPosRecordings.headPosList.Count)
+            if (currentId >= database.headPosRecordings.headPosList.Count)
             {
                 return false;
             }
-            headPosRecording = headPosRecordings.headPosList[currentId];
+            headPosRecording = database.headPosRecordings.headPosList[currentId];
             Vector3 headPosition = headPosRecording.headPosSeries[0].PosToVec();
             Quaternion headRotation = headPosRecording.headPosSeries[0].RotToQuat();
             HeadObject = Instantiate(HeadPrefab, headPosition, headRotation);
@@ -157,7 +142,7 @@ public class Replayer : MonoBehaviour
         return false;
     }
 
-    void PauseReplay()
+    public void PauseReplay()
     {
         if (coroutineRunning)
         {
@@ -166,7 +151,7 @@ public class Replayer : MonoBehaviour
         }
     }
 
-    void StopReplay()
+    public void StopReplay()
     {
         if (coroutineRunning)
         {
@@ -179,30 +164,10 @@ public class Replayer : MonoBehaviour
         }
     }
 
-    public void ToggleReplay()
-    {
-        if (!coroutineRunning)
-        {
-            StartReplay();
-        }
-        else
-        {
-            StopReplay();
-        }
-    }
-
-    public void TogglePause()
-    {
-        if (coroutineRunning)
-        {
-            PauseReplay();
-        }
-    }
-
     // Start is called before the first frame update
     void Start()
     {
-        reference = FirebaseDatabase.DefaultInstance.RootReference;
+        
     }
 
     // Update is called once per frame
@@ -225,7 +190,7 @@ public class Replayer : MonoBehaviour
         }
         if (test_sync_database)
         {
-            UpdateHeadPosRecordingsOnline();
+            database.ReadOnline();
             test_sync_database = false;
         }
     }
