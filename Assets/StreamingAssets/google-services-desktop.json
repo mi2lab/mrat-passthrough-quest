@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "447706271029",
+    "firebase_url": "https://mrat-passthrough-f5e34-default-rtdb.firebaseio.com",
+    "project_id": "mrat-passthrough-f5e34",
+    "storage_bucket": "mrat-passthrough-f5e34.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447706271029:android:4e005b5eb74f8c78e0d07c",
+        "android_client_info": {
+          "package_name": "com.MILab.MRAT_Passthrough"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "447706271029-vmk7jc10pghdih6vp69pqj60qaqidaik.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS9kh-mbjppZK7HC_seeLAgIcj1JDbbiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "447706271029-vmk7jc10pghdih6vp69pqj60qaqidaik.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

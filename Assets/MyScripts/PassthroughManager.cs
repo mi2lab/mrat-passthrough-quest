@@ -28,6 +28,6 @@ public class PassthroughManager : MonoBehaviour
 
     public void ToggleEnv(){
         passthrough.hidden = !passthrough.hidden;
-        virtualRoom.SetActive(!virtualRoom.activeSelf);
+        virtualRoom.SetActive(passthrough.hidden);
     }
 }

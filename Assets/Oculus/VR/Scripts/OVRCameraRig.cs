@@ -198,19 +198,26 @@ public class OVRCameraRig : MonoBehaviour
 			}
 			else
 			{
+				leftEyeAnchor.localPosition = centerEyeAnchor.localPosition;
+				rightEyeAnchor.localPosition = centerEyeAnchor.localPosition;
+				leftEyeAnchor.localRotation = centerEyeAnchor.localRotation;
+				rightEyeAnchor.localRotation = centerEyeAnchor.localRotation;
+
+				/*
 				Vector3 leftEyePosition = Vector3.zero;
 				Vector3 rightEyePosition = Vector3.zero;
 				Quaternion leftEyeRotation = Quaternion.identity;
 				Quaternion rightEyeRotation = Quaternion.identity;
 
 				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.LeftEye, NodeStatePropertyType.Position, OVRPlugin.Node.EyeLeft, OVRPlugin.Step.Render, out leftEyePosition))
-					leftEyeAnchor.localPosition = leftEyePosition;
+				leftEyeAnchor.localPosition = leftEyePosition;
 				if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.RightEye, NodeStatePropertyType.Position, OVRPlugin.Node.EyeRight, OVRPlugin.Step.Render, out rightEyePosition))
-					rightEyeAnchor.localPosition = rightEyePosition;
+				rightEyeAnchor.localPosition = rightEyePosition;
 				if (OVRNodeStateProperties.GetNodeStatePropertyQuaternion(Node.LeftEye, NodeStatePropertyType.Orientation, OVRPlugin.Node.EyeLeft, OVRPlugin.Step.Render, out leftEyeRotation))
-					leftEyeAnchor.localRotation = leftEyeRotation;
+				leftEyeAnchor.localRotation = leftEyeRotation;
 				if (OVRNodeStateProperties.GetNodeStatePropertyQuaternion(Node.RightEye, NodeStatePropertyType.Orientation, OVRPlugin.Node.EyeRight, OVRPlugin.Step.Render, out rightEyeRotation))
-					rightEyeAnchor.localRotation = rightEyeRotation;
+				rightEyeAnchor.localRotation = rightEyeRotation;
+				*/
 			}
 		}
 

@@ -23,8 +23,9 @@ public class ARModeManager : MonoBehaviour
     }
 
     public void ToggleVis(){
-        phone.SetActive(!phone.activeSelf);
-        fov.SetActive(!fov.activeSelf);
+        bool phoneActive = phone.activeSelf;
+        phone.SetActive(!phoneActive);
+        fov.SetActive(phoneActive);
 
         if(fov.activeSelf){
             fovCam.cullingMask = LayerMask.GetMask("Default", "Path3D");
