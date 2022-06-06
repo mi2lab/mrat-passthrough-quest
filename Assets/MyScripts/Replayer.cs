@@ -2,10 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Firebase;
-using Firebase.Database;
-using Firebase.Extensions;
-
 public class Replayer : MonoBehaviour
 {
 
@@ -16,11 +12,6 @@ public class Replayer : MonoBehaviour
     private Coroutine replayingCoroutine;
     private bool coroutineRunning = false;
     private bool coroutinePause = false;
-
-    public bool test_start = false;
-    public bool test_end = false;
-    public bool test_pause = false;
-    public bool test_sync_database = true;
 
     private int currentId = 0;
 
@@ -173,25 +164,6 @@ public class Replayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (test_start)
-        {
-            StartReplay();
-            test_start = false;
-        }
-        if (test_end)
-        {
-            StopReplay();
-            test_end = false;
-        }
-        if (test_pause)
-        {
-            PauseReplay();
-            test_pause = false;
-        }
-        if (test_sync_database)
-        {
-            database.ReadOnline();
-            test_sync_database = false;
-        }
+
     }
 }
