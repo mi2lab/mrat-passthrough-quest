@@ -15,7 +15,7 @@ public class HeadPosSeriesList
 [System.Serializable]
 public class HeadPosInfo
 {
-    public int id;
+    public string id;
     public float deltaTime;
     public long createTime;
     public long endTime;
@@ -89,6 +89,13 @@ public class RecordingDatabse : MonoBehaviour
     [SerializeField] [HideInInspector] public HeadPosSeriesList headPosRecordings = new HeadPosSeriesList();
     public HashSet<long> recordingTags = new HashSet<long>();
     private DatabaseReference reference;
+
+    public DatabaseSync database;
+
+    public string GetId()
+    {
+        return database.GetId();
+    }
 
     public void Save()
     {

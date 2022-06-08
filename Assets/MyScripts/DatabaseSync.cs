@@ -79,7 +79,7 @@ public class DatabaseSync : MonoBehaviour
 {
     public GameObject target;
     public float deltaTime = 1;
-    public int personalId = 1;
+    public string personalId = null;
     //public GameObject syncIndicator;
     private bool synchronizing = false;
     private DatabaseReference reference;
@@ -92,9 +92,15 @@ public class DatabaseSync : MonoBehaviour
     private Coroutine downCo;
     public LiveDemonstrator demo;
 
+    public AccountLogger logger;
+    private bool loggerRunning = false;
+    private Coroutine loggerCo;
+    public string tmpPersonalId = "";
+
     public bool test_up_sync = false;
     public bool test_down_sync = false;
-   
+    public bool test_account_setup = false;
+
 
     IEnumerator UpSyncCoroutine()
     {
@@ -104,7 +110,7 @@ public class DatabaseSync : MonoBehaviour
             {
                 localPos.FromTransform(target.transform);
                 string localPosJson = JsonUtility.ToJson(localPos);
-                reference.Child("livePos").Child(personalId.ToString()).SetValueAsync(localPosJson);
+                reference.Child("livePos").Child(personalId).SetValueAsync(localPosJson);
             }
             catch
             {
@@ -120,12 +126,16 @@ public class DatabaseSync : MonoBehaviour
     {
         if (!synchronizing)
         {
+            if (personalId != null)
+            {
+                reference.Child("livePos").Child(personalId).RemoveValueAsync();
+            }
             co = StartCoroutine(UpSyncCoroutine());
         }
         else
         {
             StopCoroutine(co);
-            reference.Child("livePos").Child(personalId.ToString()).RemoveValueAsync();
+            reference.Child("livePos").Child(personalId).RemoveValueAsync();
         }
         synchronizing = !synchronizing;
     }
@@ -135,15 +145,16 @@ public class DatabaseSync : MonoBehaviour
         while (true)
         {
             reference.Child("livePos")
-            .GetValueAsync().ContinueWithOnMainThread(task => {
+            .GetValueAsync().ContinueWithOnMainThread(task =>
+            {
                 if (task.IsCompleted)
                 {
                     DataSnapshot snapshot = task.Result;
 
-                    List<int> keyList = new List<int>(); 
+                    List<string> keyList = new List<string>();
                     foreach (DataSnapshot pos in snapshot.Children)
                     {
-                        int localKey = int.Parse(pos.Key);
+                        string localKey = pos.Key;
                         if (localKey != personalId)
                         {
                             HeadPos retrievedPos = JsonUtility.FromJson<HeadPos>(pos.GetValue(false).ToString());
@@ -177,6 +188,41 @@ public class DatabaseSync : MonoBehaviour
         downSynchronizing = !downSynchronizing;
     }
 
+    IEnumerator WaitLogin()
+    {
+        Debug.Log("Waiting for logger");
+        while (logger.GetAccount() == null)
+        {
+            yield return new WaitForSeconds(1);
+        }
+        Debug.Log("Logger finished");
+        string localId = logger.GetAccount();
+        if (localId != "")
+        {
+            //tmpPersonalId = localId;
+            personalId = localId;
+            Debug.Log("Result: " + personalId);
+        }
+        loggerRunning = false;
+        yield return null;
+    }
+
+    public string GetId()
+    {
+        return personalId;
+    }
+
+    public void ToggleLogIn()
+    {
+        if (!loggerRunning)
+        {
+            Debug.Log("Try login");
+            logger.CreateAccount();
+            StartCoroutine(WaitLogin());
+            loggerRunning = true;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -196,5 +242,16 @@ public class DatabaseSync : MonoBehaviour
             ToggleDownSync();
             test_down_sync = false;
         }
+        if (test_account_setup)
+        {
+            ToggleLogIn();
+            test_account_setup = false;
+        }
     }
+
+    void OnApplicationQuit()
+    {
+        reference.Child("livePos").Child(personalId).RemoveValueAsync();
+    }
+
 }

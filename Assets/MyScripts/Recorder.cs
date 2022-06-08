@@ -14,7 +14,6 @@ public class Recorder : MonoBehaviour
     public float recordDeltaTime = 0.2f;
     private Coroutine recordingCoroutine;
     private bool coroutineRunning = false;
-    private int recordingID = 0;
 
     public GameObject recordingIndicator;
     private Coroutine recordingIndicatorCoroutine;
@@ -57,9 +56,8 @@ public class Recorder : MonoBehaviour
             headPosRecording = new HeadPosSeries();
             headPosRecording.headPosSeries.Clear();
             headPosRecording.info.deltaTime = recordDeltaTime;
-            headPosRecording.info.id = recordingID;
+            headPosRecording.info.id = database.GetId();
             headPosRecording.info.createTime = System.DateTime.Now.Ticks;
-            recordingID++;
             recordingCoroutine = StartCoroutine(RecordingCoroutine());
             recordingIndicatorCoroutine = StartCoroutine(RecordingIndicatorCoroutine());
             coroutineRunning = true;

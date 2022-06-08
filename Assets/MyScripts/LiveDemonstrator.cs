@@ -29,10 +29,10 @@ public class LiveDemonstrator : MonoBehaviour
     public GameObject prefab;
     //private Dictionary<int, GameObject> itemDict = new Dictionary<int, GameObject>();
     //private Dictionary<int, Coroutine> coDict = new Dictionary<int, Coroutine>();
-    private Dictionary<int, LiveDemoItem> demoDict = new Dictionary<int, LiveDemoItem>();
+    private Dictionary<string, LiveDemoItem> demoDict = new Dictionary<string, LiveDemoItem>();
     //private Dictionary<int, bool> flagDict = new Diction
 
-    IEnumerator moveTowards(GameObject obj, HeadPos tar, int id, float delta_time)
+    IEnumerator moveTowards(GameObject obj, HeadPos tar, string id, float delta_time)
     {
         demoDict[id].running = true;
         Vector3 localPos = tar.PosToVec();
@@ -54,7 +54,7 @@ public class LiveDemonstrator : MonoBehaviour
         //break;
     }
 
-    public void UpdateItem(int id, HeadPos pos, float delta_time)
+    public void UpdateItem(string id, HeadPos pos, float delta_time)
     {
         if (demoDict.ContainsKey(id))
         {
@@ -74,9 +74,9 @@ public class LiveDemonstrator : MonoBehaviour
         }
     }
 
-    public void UpdateDict(List<int> keys)
+    public void UpdateDict(List<string> keys)
     {
-        foreach (KeyValuePair<int, LiveDemoItem> item in demoDict)
+        foreach (KeyValuePair<string, LiveDemoItem> item in demoDict)
         {
             if (!keys.Contains(item.Key))
             {
@@ -89,7 +89,7 @@ public class LiveDemonstrator : MonoBehaviour
 
     public void Stop()
     {
-        foreach (KeyValuePair<int, LiveDemoItem> item in demoDict)
+        foreach (KeyValuePair<string, LiveDemoItem> item in demoDict)
         {
             StopCoroutine(demoDict[item.Key].co);
         }
@@ -97,7 +97,7 @@ public class LiveDemonstrator : MonoBehaviour
 
     public void Destroy()
     {
-        foreach (KeyValuePair<int, LiveDemoItem> item in demoDict)
+        foreach (KeyValuePair<string, LiveDemoItem> item in demoDict)
         {
             Destroy(demoDict[item.Key].obj);
             StopCoroutine(demoDict[item.Key].co);

@@ -8,6 +8,7 @@ public class ReplayerControl : MonoBehaviour
     public Replayer replayer;
     public TextMeshPro idText;
     public TextMeshPro endTimeText;
+    public TextMeshPro userText;
 
     public int currentId = 0;
 
@@ -57,6 +58,7 @@ public class ReplayerControl : MonoBehaviour
             System.DateTime localDate = new System.DateTime((long)localInfo.endTime);
             string endTime = localDate.ToString("G");
             endTimeText.text = endTime;
+            userText.text = localInfo.id;
         }
     }
 
