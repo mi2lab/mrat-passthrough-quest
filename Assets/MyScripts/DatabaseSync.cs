@@ -101,6 +101,12 @@ public class DatabaseSync : MonoBehaviour
     public bool test_down_sync = false;
     public bool test_account_setup = false;
 
+    void AccumulatePos(string pos)
+    {
+        string key = reference.Child("livePosRecordings").Child(personalId).Push().Key;
+        reference.Child("livePosRecordings").Child(personalId).Child(key).Child("time").SetValueAsync(System.DateTime.Now.Ticks.ToString());
+        reference.Child("livePosRecordings").Child(personalId).Child(key).Child("val").SetValueAsync(pos);
+    }
 
     IEnumerator UpSyncCoroutine()
     {
@@ -111,6 +117,7 @@ public class DatabaseSync : MonoBehaviour
                 localPos.FromTransform(target.transform);
                 string localPosJson = JsonUtility.ToJson(localPos);
                 reference.Child("livePos").Child(personalId).SetValueAsync(localPosJson);
+                AccumulatePos(localPosJson);
             }
             catch
             {
@@ -186,6 +193,16 @@ public class DatabaseSync : MonoBehaviour
             demo.Destroy();
         }
         downSynchronizing = !downSynchronizing;
+    }
+
+    void DeleteAccumulation()
+    {
+        reference.Child("livePosRecordings").Child(personalId).RemoveValueAsync();
+    }
+
+    public void ToggleDeleteAccumulation()
+    {
+        DeleteAccumulation();
     }
 
     IEnumerator WaitLogin()
