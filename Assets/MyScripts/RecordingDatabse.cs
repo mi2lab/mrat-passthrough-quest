@@ -58,6 +58,11 @@ public class HeadPos
         FromTransform(t);
     }
 
+    public HeadPos(Dictionary<string, object> d)
+    {
+        FromDictionary(d);
+    }
+
     public void FromTransform(Transform t)
     {
         posX = t.position.x;
@@ -66,6 +71,16 @@ public class HeadPos
         rotX = t.rotation.eulerAngles.x;
         rotY = t.rotation.eulerAngles.y;
         rotZ = t.rotation.eulerAngles.z;
+    }
+
+    public void FromDictionary(Dictionary<string, object> d)
+    {
+        posX = (float)d["posX"];
+        posY = (float)d["posY"];
+        posZ = (float)d["posZ"];
+        rotX = (float)d["rotX"];
+        rotY = (float)d["rotY"];
+        rotZ = (float)d["rotZ"];
     }
 
     public Vector3 PosToVec()
@@ -81,6 +96,18 @@ public class HeadPos
     public Quaternion RotToQuat()
     {
         return Quaternion.Euler(this.RotToVec());
+    }
+
+    public Dictionary<string, object> ToDict()
+    {
+        return new Dictionary<string, object>{
+            { "posX", posX},
+            { "posY", posY},
+            { "posZ", posZ},
+            { "rotX", rotX},
+            { "rotY", rotY},
+            { "rotZ", rotZ}
+        };
     }
 
 }

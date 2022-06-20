@@ -6,6 +6,8 @@ using Firebase;
 using Firebase.Database;
 using Firebase.Extensions;
 
+using Firebase.Firestore;
+
 /*
 [System.Serializable]
 public class LivePos
@@ -86,6 +88,10 @@ public class DatabaseSync : MonoBehaviour
     private Coroutine co;
     HeadPos localPos = new HeadPos();
 
+    public bool useFirebase = false;
+
+    private FirebaseFirestore fs;
+
     //private Dictionary<int, HeadPos> otherPos = new Dictionary<int, HeadPos>();
     //private LivePos otherPos = new LivePos();
     private bool downSynchronizing = false;
@@ -116,12 +122,26 @@ public class DatabaseSync : MonoBehaviour
             {
                 localPos.FromTransform(target.transform);
                 string localPosJson = JsonUtility.ToJson(localPos);
-                reference.Child("livePos").Child(personalId).SetValueAsync(localPosJson);
+
+                if (useFirebase)
+                {
+                    Debug.Log(localPos.ToDict());
+                    DocumentReference fsRef = fs.Collection("livePos").Document(personalId);
+                    fsRef.SetAsync(localPos.ToDict()).ContinueWithOnMainThread(task => {
+                        Debug.Log("Added data to the alovelace document in the users collection.");
+                    }); ;
+                }
+                else
+                {
+                    reference.Child("livePos").Child(personalId).SetValueAsync(localPosJson);
+                }
+
                 AccumulatePos(localPosJson);
             }
-            catch
+            catch (System.Exception e)
             {
-                Debug.Log("Error exception");
+                Debug.LogWarning("Error exception");
+                Debug.LogWarning(e);
             }
             yield return new WaitForSeconds(deltaTime);
         }
@@ -151,31 +171,54 @@ public class DatabaseSync : MonoBehaviour
     {
         while (true)
         {
-            reference.Child("livePos")
-            .GetValueAsync().ContinueWithOnMainThread(task =>
+            if (useFirebase)
             {
-                if (task.IsCompleted)
+                fs.Collection("livePos").GetSnapshotAsync().ContinueWithOnMainThread(task =>
                 {
-                    DataSnapshot snapshot = task.Result;
-
+                    QuerySnapshot snapshot = task.Result;
                     List<string> keyList = new List<string>();
-                    foreach (DataSnapshot pos in snapshot.Children)
+                    foreach (DocumentSnapshot document in snapshot.Documents)
                     {
-                        string localKey = pos.Key;
+                        string localKey = document.Id;
                         if (localKey != personalId)
                         {
-                            HeadPos retrievedPos = JsonUtility.FromJson<HeadPos>(pos.GetValue(false).ToString());
+                            Dictionary<string, object> retrievedPosDict = document.ToDictionary();
+                            HeadPos retrievedPos = new HeadPos(retrievedPosDict);
                             demo.UpdateItem(localKey, retrievedPos, deltaTime);
                             keyList.Add(localKey);
                         }
                     }
-                    demo.UpdateDict(keyList);
-                }
-                else if (task.IsFaulted)
+                    Debug.Log("Read all data from the users collection.");
+                });
+            }
+            else
+            {
+                reference.Child("livePos")
+                .GetValueAsync().ContinueWithOnMainThread(task =>
                 {
-                    Debug.Log("Read from Database failed");
-                }
-            });
+                    if (task.IsCompleted)
+                    {
+                        DataSnapshot snapshot = task.Result;
+
+                        List<string> keyList = new List<string>();
+                        foreach (DataSnapshot pos in snapshot.Children)
+                        {
+                            string localKey = pos.Key;
+                            if (localKey != personalId)
+                            {
+                                HeadPos retrievedPos = JsonUtility.FromJson<HeadPos>(pos.GetValue(false).ToString());
+                                demo.UpdateItem(localKey, retrievedPos, deltaTime);
+                                keyList.Add(localKey);
+                            }
+                        }
+                        demo.UpdateDict(keyList);
+                    }
+                    else if (task.IsFaulted)
+                    {
+                        Debug.Log("Read from Database failed");
+                    }
+                });
+            }
             yield return new WaitForSeconds(deltaTime);
         }
         yield return null;
@@ -244,6 +287,7 @@ public class DatabaseSync : MonoBehaviour
     void Start()
     {
         reference = FirebaseDatabase.DefaultInstance.RootReference;
+        fs = FirebaseFirestore.DefaultInstance;
     }
 
     // Update is called once per frame
