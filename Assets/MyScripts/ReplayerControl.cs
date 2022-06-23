@@ -10,6 +10,10 @@ public class ReplayerControl : MonoBehaviour
     public TextMeshPro endTimeText;
     public TextMeshPro userText;
 
+    public GameObject textGrid;
+    public GameObject textItemPrefab;
+    private int prevSelected = -1;
+
     public int currentId = 0;
 
     public void IncreaseId()
@@ -40,6 +44,73 @@ public class ReplayerControl : MonoBehaviour
     }
 
     public void UpdateText()
+    {
+        foreach (Transform child in textGrid.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+        for (int i = 0; i < replayer.GetPlayListLength(); i ++)
+        {
+            AddTextItem(i);
+            SelectItem(currentId);
+        }
+    }
+
+    void AddTextItem(int id)
+    {
+        HeadPosInfo localInfo = replayer.GetReplayInfo(id);
+        //idText.text = (currentId + 1).ToString() + " / " + replayer.GetPlayListLength().ToString();
+        System.DateTime localDate = new System.DateTime((long)localInfo.endTime);
+        string endTime = localDate.ToString("G");
+        GameObject obj = new GameObject();
+        obj = Instantiate(textItemPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+        obj.transform.GetChild(0).gameObject.SetActive(false);
+        obj.transform.GetChild(1).GetComponent<UnityEngine.UI.Text>().text = (id + 1).ToString();
+        obj.transform.GetChild(2).GetComponent<UnityEngine.UI.Text>().text = localInfo.id;
+        obj.transform.GetChild(3).GetComponent<UnityEngine.UI.Text>().text = endTime;
+        UnityEngine.UI.Button btn = obj.GetComponent<UnityEngine.UI.Button>();
+        //Debug.Log(endTime);
+        btn.onClick.AddListener(delegate () {
+            if (!replayer.isReplaying())
+            {
+                this.DeselectPrev();
+                this.SelectSelf(obj);
+                replayer.SetCurrentId(currentId);
+            }
+            //prevSelected = id;
+        });
+        obj.transform.SetParent(textGrid.transform);
+        RectTransform rt = obj.GetComponent<RectTransform>();
+        rt.localScale = new Vector3(1f, 1f, 1f);
+        rt.localRotation = new Quaternion(0, 0, 0, 0);
+        rt.localPosition = new Vector3(rt.localPosition.x, rt.localPosition.y, 0);
+    }
+
+    void SelectSelf(GameObject obj)
+    {
+        obj.transform.GetChild(0).gameObject.SetActive(true);
+        currentId = int.Parse(obj.transform.GetChild(1).GetComponent<UnityEngine.UI.Text>().text) - 1;
+        //Debug.Log(currentId);
+    }
+
+    void SelectItem(int id)
+    {
+        if (id >= 0 && id < textGrid.transform.childCount)
+        {
+            textGrid.transform.GetChild(id).GetChild(0).gameObject.SetActive(true);
+        }
+    }
+
+    void DeselectPrev()
+    {
+        if (currentId >= 0 && currentId < textGrid.transform.childCount)
+        {
+            Debug.Log("Deselect " + currentId);
+            textGrid.transform.GetChild(currentId).GetChild(0).gameObject.SetActive(false);
+        }
+    }
+
+    public void PrevUpdateText()
     {
         if (replayer.GetPlayListLength() == 0)
         {

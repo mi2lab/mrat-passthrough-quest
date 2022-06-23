@@ -147,6 +147,11 @@ public class DatabaseSync : MonoBehaviour
         synchronizing = !synchronizing;
     }
 
+    public void SetDeltaTime(float t)
+    {
+        deltaTime = t;
+    }
+
     IEnumerator DownSyncCoroutine()
     {
         while (true)
