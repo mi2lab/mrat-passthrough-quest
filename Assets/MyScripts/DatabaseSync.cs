@@ -88,7 +88,7 @@ public class DatabaseSync : MonoBehaviour
     private Coroutine co;
     HeadPos localPos = new HeadPos();
 
-    public bool useFirebase = false;
+    public bool useFirestore = false;
 
     private FirebaseFirestore fs;
 
@@ -123,7 +123,7 @@ public class DatabaseSync : MonoBehaviour
                 localPos.FromTransform(target.transform);
                 string localPosJson = JsonUtility.ToJson(localPos);
 
-                if (useFirebase)
+                if (useFirestore)
                 {
                     Debug.Log(localPos.ToDict());
                     DocumentReference fsRef = fs.Collection("livePos").Document(personalId);
@@ -167,28 +167,53 @@ public class DatabaseSync : MonoBehaviour
         synchronizing = !synchronizing;
     }
 
+    public void ToggleFirestore()
+    {
+        useFirestore = !useFirestore;
+    }
+
+    public void SetDeltaTime(float t)
+    {
+        deltaTime = t;
+    }
+
     IEnumerator DownSyncCoroutine()
     {
         while (true)
         {
-            if (useFirebase)
+            if (useFirestore)
             {
                 fs.Collection("livePos").GetSnapshotAsync().ContinueWithOnMainThread(task =>
                 {
-                    QuerySnapshot snapshot = task.Result;
-                    List<string> keyList = new List<string>();
-                    foreach (DocumentSnapshot document in snapshot.Documents)
+                    if (task.IsCompleted)
                     {
-                        string localKey = document.Id;
-                        if (localKey != personalId)
+                        QuerySnapshot snapshot = task.Result;
+                        List<string> keyList = new List<string>();
+                        foreach (DocumentSnapshot document in snapshot.Documents)
                         {
-                            Dictionary<string, object> retrievedPosDict = document.ToDictionary();
-                            HeadPos retrievedPos = new HeadPos(retrievedPosDict);
-                            demo.UpdateItem(localKey, retrievedPos, deltaTime);
-                            keyList.Add(localKey);
+                            string localKey = document.Id;
+                            Debug.Log(localKey);
+                            if (localKey != personalId)
+                            {
+                                Dictionary<string, object> retrievedPosDict = document.ToDictionary();
+                                //foreach (KeyValuePair<string, object> pair in retrievedPosDict)
+                                //{
+                                //    Debug.Log("Key: " + pair.Key);
+                                //    Debug.Log("Val: " + retrievedPosDict[pair.Key]);
+                                //}
+                                HeadPos retrievedPos = new HeadPos(retrievedPosDict);
+                                //Debug.Log(retrievedPos);
+                                demo.UpdateItem(localKey, retrievedPos, deltaTime);
+                                keyList.Add(localKey);
+                            }
                         }
+                        demo.UpdateDict(keyList);
+                        Debug.Log("Read all data from the users collection.");
                     }
-                    Debug.Log("Read all data from the users collection.");
+                    else if (task.IsFaulted)
+                    {
+                        Debug.Log("Read from Database failed");
+                    }
                 });
             }
             else

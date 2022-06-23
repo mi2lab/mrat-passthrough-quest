@@ -75,12 +75,12 @@ public class HeadPos
 
     public void FromDictionary(Dictionary<string, object> d)
     {
-        posX = (float)d["posX"];
-        posY = (float)d["posY"];
-        posZ = (float)d["posZ"];
-        rotX = (float)d["rotX"];
-        rotY = (float)d["rotY"];
-        rotZ = (float)d["rotZ"];
+        posX = float.Parse(d["posX"].ToString());
+        posY = float.Parse(d["posY"].ToString());
+        posZ = float.Parse(d["posZ"].ToString());
+        rotX = float.Parse(d["rotX"].ToString());
+        rotY = float.Parse(d["rotY"].ToString());
+        rotZ = float.Parse(d["rotZ"].ToString());
     }
 
     public Vector3 PosToVec()

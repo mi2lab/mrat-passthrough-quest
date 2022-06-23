@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using TMPro;
+
 public class LiveDemonstrator : MonoBehaviour
 {
     public class LiveDemoItem
@@ -70,6 +72,7 @@ public class LiveDemonstrator : MonoBehaviour
         {
             Debug.Log("Initializing...");
             GameObject local_obj = Instantiate(prefab, pos.PosToVec(), pos.RotToQuat());
+            local_obj.transform.GetChild(0).GetComponent<TextMeshPro>().text = id;
             demoDict[id] = new LiveDemoItem(local_obj);
         }
     }
