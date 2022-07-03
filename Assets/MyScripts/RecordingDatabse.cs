@@ -29,6 +29,47 @@ public class HeadPosSeries
 }
 
 [System.Serializable]
+public class HandJoint
+{
+    public HeadPos pos = new HeadPos();
+    public string part = "";
+
+    public HandJoint()
+    {
+        pos = new HeadPos();
+        part = "";
+    }
+
+    public HandJoint(Transform t, string p = "")
+    {
+        pos = new HeadPos(t);
+        part = p;
+    }
+    
+    public HandJoint(GameObject g, string p = "")
+    {
+        pos = new HeadPos(g);
+        part = p;
+    }
+
+}
+
+[System.Serializable]
+public class HandPos
+{
+    public List<HandJoint> joints = new List<HandJoint>();
+
+    public HandPos()
+    {
+    }
+
+    public HandPos(List<HandJoint> j)
+    {
+        joints = j;
+    }
+}
+
+[System.Serializable]
 public class HeadPos
 {
     public float posX;

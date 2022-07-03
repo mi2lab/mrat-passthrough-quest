@@ -107,6 +107,9 @@ public class DatabaseSync : MonoBehaviour
     public bool test_down_sync = false;
     public bool test_account_setup = false;
 
+    public bool trackHands = true;
+    public HandTracker handTracker;
+
     void AccumulatePos(string pos)
     {
         string key = reference.Child("livePosRecordings").Child(personalId).Push().Key;
@@ -133,7 +136,18 @@ public class DatabaseSync : MonoBehaviour
                 }
                 else
                 {
-                    reference.Child("livePos").Child(personalId).SetValueAsync(localPosJson);
+                    reference.Child("livePos").Child(personalId).Child("headPos").SetValueAsync(localPosJson);
+                    reference.Child("livePos").Child(personalId).Child("useHandTrack").SetValueAsync(trackHands.ToString());
+                    if (trackHands)
+                    {
+                        HandPos handPos = handTracker.GetHandPos();
+                        //Debug.Log(handPos.joints.Count);
+                        //Debug.Log(handPos.joints[5].pos.PosToVec());
+                        handTracker.PrintHandPos();
+                        string localHandPosJson = JsonUtility.ToJson(handPos);
+                        Debug.Log(localHandPosJson);
+                        reference.Child("livePos").Child(personalId).Child("handTrack").SetValueAsync(localHandPosJson);
+                    }
                 }
 
                 AccumulatePos(localPosJson);
@@ -226,13 +240,23 @@ public class DatabaseSync : MonoBehaviour
                         DataSnapshot snapshot = task.Result;
 
                         List<string> keyList = new List<string>();
-                        foreach (DataSnapshot pos in snapshot.Children)
+                        foreach (DataSnapshot item in snapshot.Children)
                         {
-                            string localKey = pos.Key;
+                            string localKey = item.Key;
                             if (localKey != personalId)
                             {
-                                HeadPos retrievedPos = JsonUtility.FromJson<HeadPos>(pos.GetValue(false).ToString());
-                                demo.UpdateItem(localKey, retrievedPos, deltaTime);
+                                HeadPos retrievedPos = JsonUtility.FromJson<HeadPos>(item.Child("headPos").GetValue(false).ToString());
+                                if (item.Child("useHandTrack").GetValue(false).ToString() == "True" )
+                                {
+                                    HandPos retrievedHandPos = JsonUtility.FromJson<HandPos>(item.Child("handTrack").GetValue(false).ToString());
+                                    //Debug.Log(retrievedHandPos.joints.Count);
+                                    //Debug.Log(retrievedHandPos.joints[0].ToString());
+                                    demo.UpdateItem(localKey, retrievedPos, deltaTime, true, retrievedHandPos);
+                                }
+                                else
+                                {
+                                    demo.UpdateItem(localKey, retrievedPos, deltaTime);
+                                }
                                 keyList.Add(localKey);
                             }
                         }
@@ -333,11 +357,14 @@ public class DatabaseSync : MonoBehaviour
             ToggleLogIn();
             test_account_setup = false;
         }
+
+        handTracker.trackEnabled = trackHands;
+        handTracker.deltaTime = deltaTime;
     }
 
     void OnApplicationQuit()
     {
-        reference.Child("livePos").Child(personalId).RemoveValueAsync();
+        //reference.Child("livePos").Child(personalId).RemoveValueAsync();
     }
 
 }

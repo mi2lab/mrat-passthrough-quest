@@ -6792,6 +6792,7 @@ GameObject:
   - component: {fileID: 170088027}
   - component: {fileID: 170088028}
   - component: {fileID: 170088029}
+  - component: {fileID: 170088030}
   m_Layer: 0
   m_Name: DatabaseManager
   m_TagString: Untagged
@@ -6812,7 +6813,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 734695950010436887}
-  deltaTime: 0.1
+  deltaTime: 0.5
   personalId: 
   useFirestore: 0
   demo: {fileID: 170088028}
@@ -6821,6 +6822,8 @@ MonoBehaviour:
   test_up_sync: 0
   test_down_sync: 0
   test_account_setup: 0
+  trackHands: 1
+  handTracker: {fileID: 170088030}
 --- !u!4 &170088026
 Transform:
   m_ObjectHideFlags: 0
@@ -6863,6 +6866,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 8552495426358553001, guid: 93de36ac49d802f4ebf45a8684cb2b97, type: 3}
+  handJointPrefab: {fileID: 7629024915539689890, guid: 36653c900805fe64b8c7a4ae56495bd4, type: 3}
+  handJointTipPrefab: {fileID: 3482635574691988694, guid: 466d53e007262484382cc553910f7b6c, type: 3}
 --- !u!114 &170088029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6880,6 +6885,21 @@ MonoBehaviour:
   targetText: {fileID: 9151075288988980292}
   testInput: 
   testFinished: 0
+--- !u!114 &170088030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 170088024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e85533a2393faa4eb0c4619ef29d140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetHandName: R_Hand_MRTK_Rig
+  deltaTime: 1
+  trackEnabled: 0
 --- !u!1 &180120840
 GameObject:
   m_ObjectHideFlags: 0
