@@ -38,6 +38,7 @@ public class ReplayerControl : MonoBehaviour
             PanelUpdateText();
             UpdateReplayerId();
             SelectItem(currentId);
+            replayer.ReplaySnapshot();
         }
     }
 
@@ -82,6 +83,7 @@ public class ReplayerControl : MonoBehaviour
                 this.SelectSelf(obj);
                 this.PanelUpdateText();
                 replayer.SetCurrentId(currentId);
+                replayer.ReplaySnapshot();
             }
             //prevSelected = id;
         });

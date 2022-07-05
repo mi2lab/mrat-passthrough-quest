@@ -44,6 +44,11 @@ public class RecordReplayManager : MonoBehaviour
         }
     }
 
+    public void ShowSnapshot()
+    {
+        replayer.ReplaySnapshot();
+    }
+
     public void UpdateReplay()
     {
         replayer.UpdateReplay();

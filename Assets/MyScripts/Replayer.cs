@@ -21,6 +21,13 @@ public class Replayer : MonoBehaviour
     public ReplayerControl control;
     public RecordingDatabse database;
 
+    public GameObject snapshotContainer;
+    public GameObject snapshotPrefab;
+    public Material lineMaterial;
+    private Coroutine snapshotCoroutine;
+    private LineRenderer lineRenderer;
+    private bool snapshotCoroutineRunning = false;
+
     public void SetCurrentId(int id)
     {
         currentId = id;
@@ -155,15 +162,91 @@ public class Replayer : MonoBehaviour
         }
     }
 
+    IEnumerator SnapshotCoroutine(float display_time = 5f, float keep_time = 5f)
+    {
+        snapshotCoroutineRunning = true;
+        //if (snapshotContainer.GetComponent<LineRenderer>())
+        //{
+        //    Destroy(snapshotContainer.GetComponent<LineRenderer>());
+        //}
+        lineRenderer.positionCount = 0;
+        //lineRenderer.SetPositions(null);
+        
+        foreach (Transform child in snapshotContainer.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+        Queue<GameObject> snapQueue = new Queue<GameObject>(headPosRecording.headPosSeries.Count - 1);
+        Queue<Vector3> pointQueue = new Queue<Vector3>();
+        Debug.Log(headPosRecording.headPosSeries.Count);
+        //int keep_length = Mathf.RoundToInt(keep_time / headPosRecording.info.deltaTime);
+        for (int i = 0; i < headPosRecording.headPosSeries.Count; i++)
+        {
+            //if (i > keep_length) {
+            //    GameObject obj = snapQueue.Dequeue();
+            //    Destroy(obj);
+            //    pointQueue.Dequeue();
+            //}
+            Vector3 localPos = headPosRecording.headPosSeries[i].PosToVec();
+            Quaternion localRot = headPosRecording.headPosSeries[i].RotToQuat();
+            GameObject localObj = Instantiate(snapshotPrefab, localPos, localRot);
+            localObj.transform.SetParent(snapshotContainer.transform);
+            snapQueue.Enqueue(localObj);
+            pointQueue.Enqueue(localPos);
+            Debug.Log(pointQueue.Count);
+            lineRenderer.positionCount = pointQueue.Count;
+            lineRenderer.SetPositions(pointQueue.ToArray());
+            yield return new WaitForSeconds(display_time / headPosRecording.headPosSeries.Count);
+        }
+        yield return new WaitForSeconds(3f);
+        while (snapQueue.Count > 0)
+        {
+            GameObject obj = snapQueue.Dequeue();
+            Destroy(obj);
+            pointQueue.Dequeue();
+            lineRenderer.positionCount = pointQueue.Count;
+            lineRenderer.SetPositions(pointQueue.ToArray());
+            yield return new WaitForSeconds(display_time / headPosRecording.headPosSeries.Count);
+        }
+        snapshotCoroutineRunning = false;
+        lineRenderer.positionCount = 0;
+        //yield return null;
+        //yield return new WaitForSeconds(10f) ;
+        //Destroy(snapshotContainer.GetComponent<LineRenderer>());
+        yield return null;
+    }
+
+    public bool ReplaySnapshot()
+    {
+        if (snapshotCoroutineRunning)
+        {
+            StopCoroutine(snapshotCoroutine);
+        }
+        if (currentId >= database.headPosRecordings.headPosList.Count)
+        {
+            return false;
+        }
+        headPosRecording = database.headPosRecordings.headPosList[currentId];
+        snapshotCoroutine = StartCoroutine(SnapshotCoroutine());
+        return true;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        lineRenderer = snapshotContainer.AddComponent<LineRenderer>();
+        lineRenderer.material = lineMaterial;
+        //lineRenderer.startColor = Color.yellow;
+        //lineRenderer.endColor = Color.yellow;
+        lineRenderer.startWidth = 0.15f;
+        lineRenderer.endWidth = 0.01f;
+        lineRenderer.positionCount = 0;
+        lineRenderer.useWorldSpace = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 }

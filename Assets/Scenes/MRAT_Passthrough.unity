@@ -7770,6 +7770,36 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 194208926}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &196453986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 196453987}
+  m_Layer: 0
+  m_Name: SnapshotContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &196453987
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196453986}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.23480749, y: -0.9555842, z: 1.1124315}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &197114766
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48349,7 +48379,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2261995565577428465, guid: 9a7c24f281a2c3d45a9b8befe608bf77, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2347297814743337312, guid: 9a7c24f281a2c3d45a9b8befe608bf77, type: 3}
       propertyPath: m_Layer
@@ -48674,6 +48704,18 @@ PrefabInstance:
     - target: {fileID: 8793976224090999488, guid: 9a7c24f281a2c3d45a9b8befe608bf77, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8793976224090999488, guid: 9a7c24f281a2c3d45a9b8befe608bf77, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1920867784}
+    - target: {fileID: 8793976224090999488, guid: 9a7c24f281a2c3d45a9b8befe608bf77, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ShowSnapshot
+      objectReference: {fileID: 0}
+    - target: {fileID: 8793976224090999488, guid: 9a7c24f281a2c3d45a9b8befe608bf77, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: RecordReplayManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8927709776380974441, guid: 9a7c24f281a2c3d45a9b8befe608bf77, type: 3}
       propertyPath: m_Layer
@@ -61501,6 +61543,9 @@ MonoBehaviour:
   replayingIndicator: {fileID: 740274526}
   control: {fileID: 1920867783}
   database: {fileID: 170088027}
+  snapshotContainer: {fileID: 196453986}
+  snapshotPrefab: {fileID: 3482635574691988694, guid: 466d53e007262484382cc553910f7b6c, type: 3}
+  lineMaterial: {fileID: 2100000, guid: f352b5a37f052ae4ea16682b80bda2b8, type: 2}
 --- !u!114 &1920867781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61523,7 +61568,7 @@ MonoBehaviour:
   target: {fileID: 734695950010436887}
   test_start: 0
   test_end: 0
-  recordDeltaTime: 1
+  recordDeltaTime: 0.1
   recordingIndicator: {fileID: 864386997}
   replayer: {fileID: 1920867780}
   database: {fileID: 170088027}
