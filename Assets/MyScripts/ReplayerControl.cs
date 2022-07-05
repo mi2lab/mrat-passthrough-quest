@@ -18,28 +18,33 @@ public class ReplayerControl : MonoBehaviour
 
     public void IncreaseId()
     {
-        currentId = currentId < replayer.GetPlayListLength() - 1 ? currentId + 1 : currentId;
-        UpdateAll();
+        SetId(currentId + 1);
+        //UpdateAll();
     }
 
     public void DecreaseId()
     {
-        currentId = currentId >= 0 ? currentId - 1 : currentId;
-        UpdateAll();
+        //currentId = currentId >= 0 ? currentId - 1 : currentId;
+        SetId(currentId - 1);
+        //UpdateAll();
     }
 
     public void SetId(int id)
     {
         if (id >= 0 && id < replayer.GetPlayListLength())
         {
+            DeselectPrev();
             currentId = id;
-            UpdateAll();
+            PanelUpdateText();
+            UpdateReplayerId();
+            SelectItem(currentId);
         }
     }
 
     public void UpdateAll()
     {
         UpdateText();
+        PanelUpdateText();
         UpdateReplayerId();
     }
 
@@ -52,8 +57,8 @@ public class ReplayerControl : MonoBehaviour
         for (int i = 0; i < replayer.GetPlayListLength(); i ++)
         {
             AddTextItem(i);
-            SelectItem(currentId);
         }
+        SelectItem(currentId);
     }
 
     void AddTextItem(int id)
@@ -75,6 +80,7 @@ public class ReplayerControl : MonoBehaviour
             {
                 this.DeselectPrev();
                 this.SelectSelf(obj);
+                this.PanelUpdateText();
                 replayer.SetCurrentId(currentId);
             }
             //prevSelected = id;
@@ -90,6 +96,7 @@ public class ReplayerControl : MonoBehaviour
     {
         obj.transform.GetChild(0).gameObject.SetActive(true);
         currentId = int.Parse(obj.transform.GetChild(1).GetComponent<UnityEngine.UI.Text>().text) - 1;
+        //SetId(int.Parse(obj.transform.GetChild(1).GetComponent<UnityEngine.UI.Text>().text) - 1);
         //Debug.Log(currentId);
     }
 
@@ -97,6 +104,7 @@ public class ReplayerControl : MonoBehaviour
     {
         if (id >= 0 && id < textGrid.transform.childCount)
         {
+            Debug.Log(textGrid.transform.childCount);
             textGrid.transform.GetChild(id).GetChild(0).gameObject.SetActive(true);
         }
     }
@@ -105,12 +113,12 @@ public class ReplayerControl : MonoBehaviour
     {
         if (currentId >= 0 && currentId < textGrid.transform.childCount)
         {
-            Debug.Log("Deselect " + currentId);
+            //Debug.Log("Deselect " + currentId);
             textGrid.transform.GetChild(currentId).GetChild(0).gameObject.SetActive(false);
         }
     }
 
-    public void PrevUpdateText()
+    public void PanelUpdateText()
     {
         if (replayer.GetPlayListLength() == 0)
         {
