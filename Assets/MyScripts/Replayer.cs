@@ -35,16 +35,16 @@ public class Replayer : MonoBehaviour
 
     public int GetPlayListLength()
     {
-        return database.headPosRecordings.headPosList.Count;
+        return database.headPosRecordings.Count();
     }
 
     public HeadPosInfo GetReplayInfo(int id = 0)
     {
-        if (id >= database.headPosRecordings.headPosList.Count)
+        if (id >= database.headPosRecordings.Count())
         {
             return new HeadPosInfo();
         }
-        HeadPosSeries localSeries = database.headPosRecordings.headPosList[id];
+        HeadPosSeries localSeries = database.headPosRecordings[id];
         return localSeries.info;
     }
 
@@ -124,11 +124,11 @@ public class Replayer : MonoBehaviour
         {
             //string headPosJson = System.IO.File.ReadAllText(Application.persistentDataPath + "/HeadPosData.json");
             //headPosRecording = JsonUtility.FromJson<HeadPosSeries>(headPosJson);
-            if (currentId >= database.headPosRecordings.headPosList.Count)
+            if (currentId >= database.headPosRecordings.Count())
             {
                 return false;
             }
-            headPosRecording = database.headPosRecordings.headPosList[currentId];
+            headPosRecording = database.headPosRecordings[currentId];
             Vector3 headPosition = headPosRecording.headPosSeries[0].PosToVec();
             Quaternion headRotation = headPosRecording.headPosSeries[0].RotToQuat();
             HeadObject = Instantiate(HeadPrefab, headPosition, headRotation);
@@ -222,11 +222,11 @@ public class Replayer : MonoBehaviour
         {
             StopCoroutine(snapshotCoroutine);
         }
-        if (currentId >= database.headPosRecordings.headPosList.Count)
+        if (currentId >= database.headPosRecordings.Count())
         {
             return false;
         }
-        headPosRecording = database.headPosRecordings.headPosList[currentId];
+        headPosRecording = database.headPosRecordings[currentId];
         snapshotCoroutine = StartCoroutine(SnapshotCoroutine());
         return true;
     }

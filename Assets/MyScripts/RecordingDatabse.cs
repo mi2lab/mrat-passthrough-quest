@@ -7,9 +7,42 @@ using Firebase.Database;
 using Firebase.Extensions;
 
 [System.Serializable]
-public class HeadPosSeriesList
+public class RecordingDict
 {
-    public List<HeadPosSeries> headPosList = new List<HeadPosSeries>();
+    private Dictionary<string, HeadPosSeries> dict = new Dictionary<string, HeadPosSeries>();
+    private List<string> keyList = new List<string>();
+
+    public HeadPosSeries this[int id]
+    {
+        get
+        {
+            if (id < 0 || id >= keyList.Count)
+            {
+                return null;
+            }
+            if (!dict.ContainsKey(keyList[id]))
+            {
+                return null;
+            }
+            return dict[keyList[id]];
+        }
+    }
+
+    public void Add(string s, HeadPosSeries recording)
+    {
+        keyList.Add(s);
+        dict.Add(s, recording);
+    }
+
+    public int Count()
+    {
+        return keyList.Count;
+    }
+
+    public bool ContainsKey(string s)
+    {
+        return dict.ContainsKey(s);
+    }
 }
 
 [System.Serializable]
@@ -19,6 +52,11 @@ public class HeadPosInfo
     public float deltaTime;
     public long createTime;
     public long endTime;
+
+    public string ToKey()
+    {
+        return id + createTime.ToString();
+    }
 }
 
 [System.Serializable]
@@ -154,8 +192,8 @@ public class HeadPos
 }
 public class RecordingDatabse : MonoBehaviour
 {
-    [SerializeField] [HideInInspector] public HeadPosSeriesList headPosRecordings = new HeadPosSeriesList();
-    public HashSet<long> recordingTags = new HashSet<long>();
+    [SerializeField] [HideInInspector] public RecordingDict headPosRecordings = new RecordingDict();
+    public HashSet<string> recordingTags = new HashSet<string>();
     private DatabaseReference reference;
 
     public DatabaseSync database;
@@ -163,6 +201,27 @@ public class RecordingDatabse : MonoBehaviour
     public string GetId()
     {
         return database.GetId();
+    }
+
+    public void CreateOnlineItem(HeadPosInfo info)
+    {
+        string infoJson = JsonUtility.ToJson(info);
+        reference.Child("recordings").Child(info.ToKey()).Child("info").SetValueAsync(infoJson);
+        reference.Child("recordings").Child(info.ToKey()).Child("finished").SetValueAsync("false");
+    }
+
+    public void InsertOnlinePos(HeadPosInfo info, HeadPos pos)
+    {
+        string posJson = JsonUtility.ToJson(pos);
+        string key = reference.Child("recordings").Child(info.ToKey()).Child("recordings").Push().Key;
+        reference.Child("recordings").Child(info.ToKey()).Child("recordings").Child(key).SetValueAsync(posJson);
+    }
+
+    public void FinishOnlineItem(HeadPosInfo info)
+    {
+        string infoJson = JsonUtility.ToJson(info);
+        reference.Child("recordings").Child(info.ToKey()).Child("info").SetValueAsync(infoJson);
+        reference.Child("recordings").Child(info.ToKey()).Child("finished").SetValueAsync("true");
     }
 
     public void Save()
@@ -205,25 +264,32 @@ public class RecordingDatabse : MonoBehaviour
             .GetValueAsync().ContinueWithOnMainThread(task => {
                 if (task.IsCompleted)
                 {
-                    if (recordingTags.Count != headPosRecordings.headPosList.Count)
+                    /*
+                    if (recordingTags.Count != headPosRecordings.dict.Count)
                     {
                         recordingTags.Clear();
-                        for (int i = 0; i < headPosRecordings.headPosList.Count; i++)
+                        foreach (KeyValuePair<string, HeadPosSeries> pair in headPosRecordings.dict)
                         {
-                            recordingTags.Add(headPosRecordings.headPosList[i].info.createTime);
+                            recordingTags.Add(pair.Key);
                         }
                     }
+                    */
                     DataSnapshot snapshot = task.Result;
-                    HeadPosSeriesList retrievedRecordings = JsonUtility.FromJson<HeadPosSeriesList>(snapshot.GetValue(false).ToString());
-                    for (int i = 0; i < retrievedRecordings.headPosList.Count; i++)
+                    foreach (DataSnapshot recording in snapshot.Children)
                     {
-                        if (!recordingTags.Contains(retrievedRecordings.headPosList[i].info.createTime))
+                        if (!headPosRecordings.ContainsKey(recording.Key) && recording.Child("finished").GetValue(false).ToString() == "true")
                         {
-                            headPosRecordings.headPosList.Add(retrievedRecordings.headPosList[i]);
-                            recordingTags.Add(retrievedRecordings.headPosList[i].info.createTime);
+                            HeadPosSeries localRecordings = new HeadPosSeries();
+                            localRecordings.info = JsonUtility.FromJson<HeadPosInfo>(recording.Child("info").GetValue(false).ToString());
+                            foreach (DataSnapshot headPos in recording.Child("recordings").Children)
+                            {
+                                HeadPos pos = JsonUtility.FromJson<HeadPos>(headPos.GetValue(false).ToString());
+                                localRecordings.headPosSeries.Add(pos);
+                            }
+                            headPosRecordings.Add(recording.Key, localRecordings);
+                            //recordingTags.Add(recording.Key);
                         }
                     }
-                    
                 }
                 else if (task.IsFaulted)
                 {
@@ -266,8 +332,9 @@ public class RecordingDatabse : MonoBehaviour
 
     public void DeleteOnline()
     {
-        headPosRecordings = new HeadPosSeriesList();
-        SaveOnline();
+        headPosRecordings = new RecordingDict();
+        reference.Child("recordings").SetValueAsync(null);
+        //SaveOnline();
     }
 
     // Start is called before the first frame update

@@ -37,6 +37,7 @@ public class Recorder : MonoBehaviour
         {
             HeadPos localPos = new HeadPos(target);
             headPosRecording.headPosSeries.Add(localPos);
+            database.InsertOnlinePos(headPosRecording.info, localPos);
             //Debug.Log(localPos.posX);
             yield return new WaitForSeconds(recordDeltaTime);
         }
@@ -58,6 +59,7 @@ public class Recorder : MonoBehaviour
             headPosRecording.info.deltaTime = recordDeltaTime;
             headPosRecording.info.id = database.GetId();
             headPosRecording.info.createTime = System.DateTime.Now.Ticks;
+            database.CreateOnlineItem(headPosRecording.info);
             recordingCoroutine = StartCoroutine(RecordingCoroutine());
             recordingIndicatorCoroutine = StartCoroutine(RecordingIndicatorCoroutine());
             coroutineRunning = true;
@@ -68,13 +70,15 @@ public class Recorder : MonoBehaviour
     {
         if (coroutineRunning)
         {
+            
             StopCoroutine(recordingCoroutine);
             headPosRecording.info.endTime = System.DateTime.Now.Ticks;
             StopCoroutine(recordingIndicatorCoroutine);
             recordingIndicator.SetActive(false);
             Debug.Log(headPosRecording.info.createTime);
-            database.headPosRecordings.headPosList.Add(headPosRecording);
-            database.Save();
+            database.headPosRecordings.Add(headPosRecording.info.ToKey(), headPosRecording);
+            database.FinishOnlineItem(headPosRecording.info);
+            //database.Save();
             replayer.UpdateReplayPanel();
             coroutineRunning = false;
             //database.UpdateHeadPosRecordingsLocal();

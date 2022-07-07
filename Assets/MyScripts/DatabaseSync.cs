@@ -150,7 +150,7 @@ public class DatabaseSync : MonoBehaviour
                     }
                 }
 
-                AccumulatePos(localPosJson);
+                //AccumulatePos(localPosJson);
             }
             catch (System.Exception e)
             {
