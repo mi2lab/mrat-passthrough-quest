@@ -107,7 +107,7 @@ public class DatabaseSync : MonoBehaviour
     public bool test_down_sync = false;
     public bool test_account_setup = false;
 
-    public bool trackHands = true;
+    public bool trackHands = false;
     public HandTracker handTracker;
 
     void AccumulatePos(string pos)
@@ -332,6 +332,11 @@ public class DatabaseSync : MonoBehaviour
         }
     }
 
+    public void ToggleHandTrack()
+    {
+        trackHands = !trackHands;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -358,7 +363,7 @@ public class DatabaseSync : MonoBehaviour
             test_account_setup = false;
         }
 
-        handTracker.trackEnabled = trackHands;
+        //handTracker.trackEnabled = trackHands;
         handTracker.deltaTime = deltaTime;
     }
 

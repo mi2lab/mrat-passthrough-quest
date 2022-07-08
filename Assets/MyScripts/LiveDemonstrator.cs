@@ -4,46 +4,57 @@ using UnityEngine;
 
 using TMPro;
 
+public class LiveDemoGroup
+{
+    public List<LiveDemoItem> item = new List<LiveDemoItem>();
+    public bool running = false;
+    public bool trackHands = false;
+
+    public void AddDemo(GameObject obj)
+    {
+        item.Add(new LiveDemoItem(obj));
+    }
+
+    public void DiscardOtherThanHead()
+    {
+        //LiveDemoItem tmp = item[0];
+        for (int i = item.Count - 1; i > 0; i--)
+        {
+            item[i].End();
+            item.RemoveAt(i);
+        }
+        //item[]
+        //item.Clear();
+        //item.Add(tmp);
+    }
+
+}
+
+public class LiveDemoItem
+{
+    public GameObject obj;
+    public Coroutine co;
+
+    public LiveDemoItem()
+    {
+        obj = new GameObject();
+        co = null;
+    }
+
+    public LiveDemoItem(GameObject obj)
+    {
+        this.obj = obj;
+        co = null;
+    }
+
+    public void End()
+    {
+        GameObject.Destroy(obj);
+    }
+}
+
 public class LiveDemonstrator : MonoBehaviour
 {
-    public class LiveDemoGroup
-    {
-        public List<LiveDemoItem> item = new List<LiveDemoItem>();
-        public bool running = false;
-        public bool trackHands = false;
-
-        public void AddDemo(GameObject obj)
-        {
-            item.Add(new LiveDemoItem(obj));
-        }
-
-        public void DiscardOtherThanHead()
-        {
-            LiveDemoItem tmp = item[0];
-            item.Clear();
-            item.Add(tmp);
-        }
-
-    }
-
-    public class LiveDemoItem
-    {
-        public GameObject obj;
-        public Coroutine co;
-
-        public LiveDemoItem()
-        {
-            obj = new GameObject();
-            co = null;
-        }
-
-        public LiveDemoItem(GameObject obj)
-        {
-            this.obj = obj;
-            co = null;
-        }
-    }
-
     public GameObject prefab;
     //private Dictionary<int, GameObject> itemDict = new Dictionary<int, GameObject>();
     //private Dictionary<int, Coroutine> coDict = new Dictionary<int, Coroutine>();
@@ -74,7 +85,7 @@ public class LiveDemonstrator : MonoBehaviour
 
     public void UpdateItem(string id, HeadPos pos, float delta_time, bool trackHands = false, HandPos handPos = null)
     {
-        Debug.Log("Updating item");
+        //Debug.Log("Updating item");
         if (demoDict.ContainsKey(id))
         {
             if (demoDict[id].running)
@@ -85,10 +96,13 @@ public class LiveDemonstrator : MonoBehaviour
                 }
                 demoDict[id].running = false;
             }
-            if (trackHands && !demoDict[id].trackHands)
+            if (trackHands && handPos == null)
             {
+                demoDict[id].DiscardOtherThanHead();
+            }
+            else if (trackHands && handPos!= null && (handPos.joints.Count != (demoDict[id].item.Count - 1) || ( !demoDict[id].trackHands))) {
                 //Debug.Log("Hand track off in dict, turn it on...");
-                int count = 0;
+                demoDict[id].DiscardOtherThanHead();
                 foreach (HandJoint joint in handPos.joints)
                 {
                     //Debug.Log(++count);

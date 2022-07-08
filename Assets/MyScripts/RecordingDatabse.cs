@@ -64,6 +64,9 @@ public class HeadPosSeries
 {
     public HeadPosInfo info = new HeadPosInfo();
     public List<HeadPos> headPosSeries = new List<HeadPos>();
+
+    public bool useHandTrack = false;
+    public List<HandPos> handPosSeries = new List<HandPos>();
 }
 
 [System.Serializable]
@@ -104,6 +107,21 @@ public class HandPos
     public HandPos(List<HandJoint> j)
     {
         joints = j;
+    }
+
+    public void Add(List<HandJoint> j)
+    {
+        joints.AddRange(j);
+    }
+
+    public void Print()
+    {
+        Debug.Log("#" + joints.Count);
+        foreach (HandJoint joint in joints)
+        {
+            Debug.Log(joint.pos.PosToVec());
+        }
+
     }
 }
 
@@ -203,25 +221,31 @@ public class RecordingDatabse : MonoBehaviour
         return database.GetId();
     }
 
-    public void CreateOnlineItem(HeadPosInfo info)
+    public void CreateOnlineItem(HeadPosInfo info, bool trackHand = false)
     {
         string infoJson = JsonUtility.ToJson(info);
         reference.Child("recordings").Child(info.ToKey()).Child("info").SetValueAsync(infoJson);
-        reference.Child("recordings").Child(info.ToKey()).Child("finished").SetValueAsync("false");
+        reference.Child("recordings").Child(info.ToKey()).Child("trackHands").SetValueAsync(trackHand.ToString());
+        reference.Child("recordings").Child(info.ToKey()).Child("finished").SetValueAsync("False");
     }
 
-    public void InsertOnlinePos(HeadPosInfo info, HeadPos pos)
+    public void InsertOnlinePos(HeadPosInfo info, HeadPos pos, bool trackHand = false, HandPos handPos = null)
     {
         string posJson = JsonUtility.ToJson(pos);
         string key = reference.Child("recordings").Child(info.ToKey()).Child("recordings").Push().Key;
-        reference.Child("recordings").Child(info.ToKey()).Child("recordings").Child(key).SetValueAsync(posJson);
+        reference.Child("recordings").Child(info.ToKey()).Child("recordings").Child(key).Child("head").SetValueAsync(posJson);
+        if (trackHand)
+        {
+            string handPosJson = JsonUtility.ToJson(handPos);
+            reference.Child("recordings").Child(info.ToKey()).Child("recordings").Child(key).Child("hand").SetValueAsync(handPosJson);
+        }
     }
 
     public void FinishOnlineItem(HeadPosInfo info)
     {
         string infoJson = JsonUtility.ToJson(info);
         reference.Child("recordings").Child(info.ToKey()).Child("info").SetValueAsync(infoJson);
-        reference.Child("recordings").Child(info.ToKey()).Child("finished").SetValueAsync("true");
+        reference.Child("recordings").Child(info.ToKey()).Child("finished").SetValueAsync("True");
     }
 
     public void Save()
@@ -277,15 +301,39 @@ public class RecordingDatabse : MonoBehaviour
                     DataSnapshot snapshot = task.Result;
                     foreach (DataSnapshot recording in snapshot.Children)
                     {
-                        if (!headPosRecordings.ContainsKey(recording.Key) && recording.Child("finished").GetValue(false).ToString() == "true")
+                        if (!headPosRecordings.ContainsKey(recording.Key) && recording.Child("finished").GetValue(false).ToString() == "True")
                         {
                             HeadPosSeries localRecordings = new HeadPosSeries();
                             localRecordings.info = JsonUtility.FromJson<HeadPosInfo>(recording.Child("info").GetValue(false).ToString());
-                            foreach (DataSnapshot headPos in recording.Child("recordings").Children)
+                            bool trackHands = recording.Child("trackHands").GetValue(false).ToString() == "True";
+                            localRecordings.useHandTrack = trackHands;
+                            if (trackHands)
                             {
-                                HeadPos pos = JsonUtility.FromJson<HeadPos>(headPos.GetValue(false).ToString());
-                                localRecordings.headPosSeries.Add(pos);
+                                foreach (DataSnapshot posItem in recording.Child("recordings").Children)
+                                {
+                                    HeadPos pos = JsonUtility.FromJson<HeadPos>(posItem.Child("head").GetValue(false).ToString());
+                                    localRecordings.headPosSeries.Add(pos);
+                                    if (posItem.Child("hand").GetValue(false).ToString() != "")
+                                    {
+                                        HandPos handPos = JsonUtility.FromJson<HandPos>(posItem.Child("hand").GetValue(false).ToString());
+                                        localRecordings.handPosSeries.Add(handPos);
+                                    }
+                                    else
+                                    {
+                                        localRecordings.handPosSeries.Add(null);
+                                    }
+                                    
+                                }
                             }
+                            else
+                            {
+                                foreach (DataSnapshot posItem in recording.Child("recordings").Children)
+                                {
+                                    HeadPos pos = JsonUtility.FromJson<HeadPos>(posItem.Child("head").GetValue(false).ToString());
+                                    localRecordings.headPosSeries.Add(pos);
+                                }
+                            }
+                            
                             headPosRecordings.Add(recording.Key, localRecordings);
                             //recordingTags.Add(recording.Key);
                         }

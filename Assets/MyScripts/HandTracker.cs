@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class HandTracker : MonoBehaviour
 {
-    public string targetHandName = "R_Hand_MRTK_Rig";
+    public string targetRHandName = "R_Hand_MRTK_Rig";
+    public string targetLHandName = "L_Hand_MRTK_Rig";
     [HideInInspector] public float deltaTime = 1f;
-    [HideInInspector] public bool trackEnabled = false;
+    [HideInInspector] private bool trackEnabled = true;
     private bool trackRunning = false;
     private Coroutine tracking_co;
-    private GameObject trackedHand;
+    private GameObject trackedLHand;
+    private GameObject trackedRHand;
     private HandPos handPos;
 
     // Start is called before the first frame update
@@ -21,10 +23,15 @@ public class HandTracker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (trackedHand == null)
+        if (trackedLHand == null)
         {
             //Debug.Log("Finding");
-            trackedHand = GameObject.Find(targetHandName);
+            trackedLHand = GameObject.Find(targetLHandName);
+        }
+        if (trackedRHand == null)
+        {
+            //Debug.Log("Finding");
+            trackedRHand = GameObject.Find(targetRHandName);
         }
         if (trackEnabled)
         {
@@ -48,7 +55,7 @@ public class HandTracker : MonoBehaviour
     {
         while (true)
         {
-            if (trackedHand != null)
+            if (trackedLHand != null || trackedRHand != null)
             {
                 UpdateHandPos();
             }
@@ -65,6 +72,10 @@ public class HandTracker : MonoBehaviour
     private List<HandJoint> GetHandPosHelper(GameObject t)
     {
         List<HandJoint> retList = new List<HandJoint> ();
+        if (!t)
+        {
+            return retList;
+        }
         foreach (Transform child in t.transform)
         {
             retList.AddRange(GetHandPosHelper(child.gameObject));
@@ -85,7 +96,8 @@ public class HandTracker : MonoBehaviour
     public void UpdateHandPos()
     {
         //Debug.Log("Updating...");
-        handPos = new HandPos(GetHandPosHelper(trackedHand));
+        handPos = new HandPos(GetHandPosHelper(trackedLHand));
+        handPos.Add(GetHandPosHelper(trackedRHand));
         //Debug.Log(handPos.joints.Count);
         //Debug.Log(handPos.joints[5].pos.PosToVec());
     }

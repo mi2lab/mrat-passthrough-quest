@@ -21,6 +21,9 @@ public class Recorder : MonoBehaviour
     public Replayer replayer;
     public RecordingDatabse database;
 
+    public HandTracker handTracker;
+    public bool trackHands = false;
+
     IEnumerator RecordingIndicatorCoroutine()
     {
         while (true)
@@ -37,7 +40,22 @@ public class Recorder : MonoBehaviour
         {
             HeadPos localPos = new HeadPos(target);
             headPosRecording.headPosSeries.Add(localPos);
-            database.InsertOnlinePos(headPosRecording.info, localPos);
+            if (headPosRecording.useHandTrack)
+            {
+                HandPos localHandPos = handTracker.GetHandPos();
+                /*
+                if (localHandPos != null)
+                {
+                    localHandPos.Print();
+                }
+                */
+                headPosRecording.handPosSeries.Add(localHandPos);
+                database.InsertOnlinePos(headPosRecording.info, localPos, true, handTracker.GetHandPos());
+            }
+            else
+            {
+                database.InsertOnlinePos(headPosRecording.info, localPos);
+            }
             //Debug.Log(localPos.posX);
             yield return new WaitForSeconds(recordDeltaTime);
         }
@@ -59,7 +77,8 @@ public class Recorder : MonoBehaviour
             headPosRecording.info.deltaTime = recordDeltaTime;
             headPosRecording.info.id = database.GetId();
             headPosRecording.info.createTime = System.DateTime.Now.Ticks;
-            database.CreateOnlineItem(headPosRecording.info);
+            headPosRecording.useHandTrack = trackHands;
+            database.CreateOnlineItem(headPosRecording.info, trackHands);
             recordingCoroutine = StartCoroutine(RecordingCoroutine());
             recordingIndicatorCoroutine = StartCoroutine(RecordingIndicatorCoroutine());
             coroutineRunning = true;
