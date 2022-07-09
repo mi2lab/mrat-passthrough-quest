@@ -316,6 +316,23 @@ public class DatabaseSync : MonoBehaviour
         yield return null;
     }
 
+    IEnumerator WaitLoginGenerate()
+    {
+        Debug.Log("Waiting for logger");
+        while (logger.GetAccount() == null || logger.GetAccount() == "")
+        {
+            logger.GenerateUserName();
+            yield return new WaitForSeconds(1);
+        }
+        Debug.Log("Logger finished");
+        string localId = logger.GetAccount();
+        //tmpPersonalId = localId;
+        personalId = localId;
+        Debug.Log("Result: " + personalId);
+        loggerRunning = false;
+        yield return null;
+    }
+
     public string GetId()
     {
         return personalId;
@@ -342,6 +359,8 @@ public class DatabaseSync : MonoBehaviour
     {
         reference = FirebaseDatabase.DefaultInstance.RootReference;
         fs = FirebaseFirestore.DefaultInstance;
+        //logger.GenerateUserName();
+        StartCoroutine(WaitLoginGenerate());
     }
 
     // Update is called once per frame
@@ -369,7 +388,8 @@ public class DatabaseSync : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        //reference.Child("livePos").Child(personalId).RemoveValueAsync();
+        reference.Child("livePos").Child(personalId).RemoveValueAsync();
+        //reference.Child("livePosRecordings").RemoveValueAsync();
     }
 
 }

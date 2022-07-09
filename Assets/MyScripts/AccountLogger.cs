@@ -86,7 +86,9 @@ public class AccountLogger : MonoBehaviour
     private void CheckAvailability(string account)
     {
         availabilityCheckFinished = false;
-        reference.Child("livePos")
+        if (reference != null)
+        {
+            reference.Child("livePos")
             .GetValueAsync().ContinueWithOnMainThread(task => {
                 if (task.IsCompleted)
                 {
@@ -100,15 +102,56 @@ public class AccountLogger : MonoBehaviour
                         }
                     }
                     inputLegal = true;
-                    availabilityCheckFinished = true;
+                    //availabilityCheckFinished = true;
                 }
                 else if (task.IsFaulted)
                 {
                     Debug.Log("Read from Database failed");
                 }
             });
+        }
+        availabilityCheckFinished = true;
         Debug.Log("Availability checked");
         return;
+    }
+
+    private List<string> nameList = new List<string>
+        {
+        "Albedo",
+        "Amber",
+        "Bennett",
+        "Diluc",
+        "Eula",
+        "Fischl",
+        "Rosaria",
+        "Venti",
+        "Corhyn",
+        "Sellen",
+        "Fia",
+        "Gideon",
+        "Melina",
+        "Marika",
+        "Radagon",
+        "Ranni",
+        "Rogier",
+        "Anri",
+        "Andre",
+        "Siegward",
+        "Geralt",
+        "Triss",
+        "Yennefer",
+        "Dandelion"
+        };
+
+    public void GenerateUserName()
+    {
+        if (availabilityCheckFinished && !inputLegal)
+        {
+            Debug.Log("Checking: " + inputText);
+            inputText = nameList[Random.Range(0, nameList.Count)];
+            CheckAvailability(inputText);
+        }
+        Debug.Log(inputText + " " + availabilityCheckFinished + " " + inputLegal);
     }
 
     // Start is called before the first frame update
