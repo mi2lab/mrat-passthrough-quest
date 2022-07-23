@@ -355,6 +355,7 @@ public class Replayer : MonoBehaviour
         }
         Queue<GameObject> snapQueue = new Queue<GameObject>(headPosRecording.headPosSeries.Count - 1);
         Queue<Vector3> pointQueue = new Queue<Vector3>();
+        Queue<Vector3> checkQueue = new Queue<Vector3>();
         Debug.Log(headPosRecording.headPosSeries.Count);
         //int keep_length = Mathf.RoundToInt(keep_time / headPosRecording.info.deltaTime);
         for (int i = 0; i < headPosRecording.headPosSeries.Count; i++)
@@ -366,9 +367,29 @@ public class Replayer : MonoBehaviour
             //}
             Vector3 localPos = headPosRecording.headPosSeries[i].PosToVec();
             Quaternion localRot = headPosRecording.headPosSeries[i].RotToQuat();
-            GameObject localObj = Instantiate(snapshotPrefab, localPos, localRot);
-            localObj.transform.SetParent(snapshotContainer.transform);
-            snapQueue.Enqueue(localObj);
+
+            void spawnObj()
+            {
+                GameObject localObj = Instantiate(snapshotPrefab, localPos, localRot);
+                localObj.transform.SetParent(snapshotContainer.transform);
+                snapQueue.Enqueue(localObj);
+            }
+            Vector3 prevPos;
+            if (checkQueue.Count >= 3)
+            {
+                prevPos = checkQueue.Dequeue();
+                if (Vector3.Distance(prevPos, localPos) > 0.15)
+                {
+                    spawnObj();
+                    checkQueue.Clear();
+                }
+            }
+            else if (checkQueue.Count == 1)
+            {
+                spawnObj();
+            }
+            checkQueue.Enqueue(localPos);
+
             pointQueue.Enqueue(localPos);
             //Debug.Log(pointQueue.Count);
             lineRenderer.positionCount = pointQueue.Count;
@@ -380,6 +401,9 @@ public class Replayer : MonoBehaviour
         {
             GameObject obj = snapQueue.Dequeue();
             Destroy(obj);
+        }
+        while (pointQueue.Count > 0)
+        {
             pointQueue.Dequeue();
             lineRenderer.positionCount = pointQueue.Count;
             lineRenderer.SetPositions(pointQueue.ToArray());
@@ -413,10 +437,14 @@ public class Replayer : MonoBehaviour
     {
         lineRenderer = snapshotContainer.AddComponent<LineRenderer>();
         lineRenderer.material = lineMaterial;
+        //lineRenderer.material.SetColor("_Color", new Color(255f, 255f, 0f, 0.3f));
         //lineRenderer.startColor = Color.yellow;
         //lineRenderer.endColor = Color.yellow;
         lineRenderer.startWidth = 0.15f;
         lineRenderer.endWidth = 0.01f;
+        lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        lineRenderer.receiveShadows = false;
+        //lineRenderer.numCornerVertices = 10;
         lineRenderer.positionCount = 0;
         lineRenderer.useWorldSpace = true;
     }
