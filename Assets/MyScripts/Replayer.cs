@@ -32,6 +32,9 @@ public class Replayer : MonoBehaviour
     public GameObject handJointTipPrefab;
     public GameObject handJointPrefab;
 
+    public GameObject avatarPrefab;
+    private bool useAvatar = true;
+
     public void SetCurrentId(int id)
     {
         currentId = id;
@@ -153,6 +156,33 @@ public class Replayer : MonoBehaviour
             Coroutine hand_co = StartCoroutine(moveTowards(item.obj, handPos.joints[i - 1].pos, delta_time));
             item.co = hand_co;
         }
+        //avatar
+        if (demo.avatarEnabled)
+        {
+            Vector3 head_pos = pos.PosToVec();
+            Quaternion head_rot = pos.RotToQuat();
+            Vector3 left_pos = new Vector3();
+            Quaternion left_rot = new Quaternion();
+            Vector3 right_pos = new Vector3();
+            Quaternion right_rot = new Quaternion();
+            if (handPos != null)
+            {
+                foreach (HandJoint joint in handPos.joints)
+                {
+                    if (joint.part == "L_Middle_1")
+                    {
+                        left_pos = joint.pos.PosToVec();
+                        left_rot = joint.pos.RotToQuat();
+                    }
+                    else if (joint.part == "R_Middle_1")
+                    {
+                        right_pos = joint.pos.PosToVec();
+                        right_rot = joint.pos.RotToQuat();
+                    }
+                }
+            }
+            demo.avatar.GetComponent<AvatarUpdateManager>().UpdateAvatar(head_pos, head_rot, left_pos, left_rot, right_pos, right_rot, head_pos, new Quaternion(), delta_time);
+        }
     }
 
     IEnumerator ReplayingIndicatorCoroutine()
@@ -182,6 +212,7 @@ public class Replayer : MonoBehaviour
             yield return new WaitForSeconds(headPosRecording.info.deltaTime);
         }
         demo.running = false;
+        Destroy(demo.avatar);
         foreach (LiveDemoItem group_item in demo.item)
         {
             Destroy(group_item.obj);
@@ -277,6 +308,10 @@ public class Replayer : MonoBehaviour
             Quaternion headRotation = headPosRecording.headPosSeries[0].RotToQuat();
 
             GameObject local_obj = Instantiate(HeadPrefab, headPosition, headRotation);
+            if (useAvatar)
+            {
+                local_obj.SetActive(false);
+            }
             //local_obj.transform.GetChild(0).GetComponent<TextMeshPro>().text = id;
             demo = new LiveDemoGroup();
             demo.AddDemo(local_obj);
@@ -300,6 +335,10 @@ public class Replayer : MonoBehaviour
                 }
                 demo.trackHands = true;
             }
+
+            demo.avatarEnabled = true;
+            GameObject avatar = Instantiate(avatarPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+            demo.avatar = avatar;
 
             replayingCoroutine = StartCoroutine(ReplayingCoroutine());
             replayingIndicatorCoroutine = StartCoroutine(ReplayingIndicatorCoroutine());

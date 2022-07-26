@@ -30,6 +30,9 @@ public class CustomedOVRInputManager : OvrAvatarInputManager
         private Transform _rightHandTarget;
         private Transform _trackingSpace;
 
+        private Vector3 _headPos;
+        private Quaternion _headRot;
+
         public CustomedInputTrackingDelegate(Transform headTarget, Transform leftHandTarget, Transform rightHandTarget, Transform trackingSpace)
         {
             _headTarget = headTarget;
@@ -37,6 +40,14 @@ public class CustomedOVRInputManager : OvrAvatarInputManager
             _rightHandTarget = rightHandTarget;
             _trackingSpace = trackingSpace;
         }
+
+        /*
+        public void UpdateTarget(Vector3 head_pos, Quaternion head_rot)
+        {
+            _headPos = head_pos;
+            _headRot = head_rot;
+        }
+        */
         
         public override bool GetRawInputTrackingState(out OvrAvatarInputTrackingState inputTrackingState)
         {
@@ -47,9 +58,12 @@ public class CustomedOVRInputManager : OvrAvatarInputManager
             inputTrackingState.leftControllerVisible = false;
             inputTrackingState.rightControllerVisible = false;
 
-            Pose headPose = GetTrackingSpacePose(_headTarget.position, _headTarget.rotation);
-            Pose leftHandPose = GetTrackingSpacePose(_leftHandTarget.position, _leftHandTarget.rotation);
-            Pose rightHandPose = GetTrackingSpacePose(_rightHandTarget.position, _rightHandTarget.rotation);
+            //Pose headPose = GetTrackingSpacePose(_headTarget.position, _headTarget.rotation);
+            Pose headPose = new Pose(_headTarget.position, _headTarget.rotation);
+            //Pose leftHandPose = GetTrackingSpacePose(_leftHandTarget.position, _leftHandTarget.rotation);
+            Pose leftHandPose = new Pose(_leftHandTarget.position, _leftHandTarget.rotation);
+            //Pose rightHandPose = GetTrackingSpacePose(_rightHandTarget.position, _rightHandTarget.rotation);
+            Pose rightHandPose = new Pose(_rightHandTarget.position, _rightHandTarget.rotation);
 
             inputTrackingState.headset.position = headPose.position;
             inputTrackingState.headset.orientation = headPose.rotation;
@@ -63,7 +77,7 @@ public class CustomedOVRInputManager : OvrAvatarInputManager
 
             return true;
         }
-
+        
         private Pose GetTrackingSpacePose(Vector3 worldPosition, Quaternion worldRotation)
         {
             Vector3 position = _trackingSpace.InverseTransformPoint(worldPosition);
@@ -71,6 +85,7 @@ public class CustomedOVRInputManager : OvrAvatarInputManager
 
             return new Pose(position, rotation);
         }
+        
     }
 
     private class CustomInputControlDelegate : OvrAvatarInputControlDelegate

@@ -10,6 +10,9 @@ public class LiveDemoGroup
     public bool running = false;
     public bool trackHands = false;
 
+    public GameObject avatar;
+    public bool avatarEnabled = true;
+
     public void AddDemo(GameObject obj)
     {
         item.Add(new LiveDemoItem(obj));
@@ -63,6 +66,9 @@ public class LiveDemonstrator : MonoBehaviour
 
     public GameObject handJointPrefab;
     public GameObject handJointTipPrefab;
+
+    public GameObject avatarPrefab;
+
     IEnumerator moveTowards(GameObject obj, HeadPos tar, float delta_time)
     {
         Vector3 localPos = tar.PosToVec();
@@ -83,7 +89,7 @@ public class LiveDemonstrator : MonoBehaviour
         //break;
     }
 
-    public void UpdateItem(string id, HeadPos pos, float delta_time, bool trackHands = false, HandPos handPos = null)
+    public void UpdateItem(string id, HeadPos pos, float delta_time, bool trackHands = false, HandPos handPos = null, bool useAvatar = true)
     {
         //Debug.Log("Updating item");
         if (demoDict.ContainsKey(id))
@@ -96,6 +102,22 @@ public class LiveDemonstrator : MonoBehaviour
                 }
                 demoDict[id].running = false;
             }
+
+            /*
+            if (demoDict[id].trackHands)
+            {
+                if (left_id >= 1 && left_id < demoDict[id].item.Count)
+                {
+                    left_pos = handPos.joints[left_id - 1].pos.PosToVec();
+                    left_rot = handPos.joints[left_id - 1].pos.RotToQuat();
+                }
+                if (right_id >= 1 && right_id < demoDict[id].item.Count)
+                {
+                    right_pos = handPos.joints[right_id - 1].pos.PosToVec();
+                    right_rot = handPos.joints[right_id - 1].pos.RotToQuat();
+                }
+            }
+            */
             if (trackHands && handPos == null)
             {
                 demoDict[id].DiscardOtherThanHead();
@@ -103,8 +125,10 @@ public class LiveDemonstrator : MonoBehaviour
             else if (trackHands && handPos!= null && (handPos.joints.Count != (demoDict[id].item.Count - 1) || ( !demoDict[id].trackHands))) {
                 //Debug.Log("Hand track off in dict, turn it on...");
                 demoDict[id].DiscardOtherThanHead();
+                //int joint_id = 0;
                 foreach (HandJoint joint in handPos.joints)
                 {
+                    //joint_id++;
                     //Debug.Log(++count);
                     HeadPos jointPos = joint.pos;
                     Debug.Log(jointPos.PosToVec());
@@ -115,6 +139,16 @@ public class LiveDemonstrator : MonoBehaviour
                     }
                     else
                     {
+                        /*
+                        if (joint.part == "R_Wrist")
+                        {
+                            right_id = joint_id;
+                        }
+                        else if (joint.part == "L_Wrist")
+                        {
+                            left_id = joint_id;
+                        }
+                        */
                         local_obj = Instantiate(handJointPrefab, jointPos.PosToVec(), jointPos.RotToQuat());
                     }
                     demoDict[id].AddDemo(local_obj);
@@ -138,19 +172,49 @@ public class LiveDemonstrator : MonoBehaviour
                 Coroutine hand_co = StartCoroutine(moveTowards(item.obj, handPos.joints[i - 1].pos, delta_time));
                 item.co = hand_co;
             }
+            //avatar
+            if (demoDict[id].avatarEnabled)
+            {
+                Vector3 head_pos = pos.PosToVec();
+                Quaternion head_rot = pos.RotToQuat();
+                Vector3 left_pos = new Vector3();
+                Quaternion left_rot = new Quaternion();
+                Vector3 right_pos = new Vector3();
+                Quaternion right_rot = new Quaternion();
+                foreach (HandJoint joint in handPos.joints)
+                {
+                    if (joint.part == "L_Wrist")
+                    {
+                        left_pos = joint.pos.PosToVec();
+                        left_rot = joint.pos.RotToQuat();
+                    }
+                    else if (joint.part == "R_Wrist")
+                    {
+                        right_pos = joint.pos.PosToVec();
+                        right_rot = joint.pos.RotToQuat();
+                    }
+                }
+                demoDict[id].avatar.GetComponent<AvatarUpdateManager>().UpdateAvatar(head_pos, head_rot, left_pos, left_rot, right_pos, right_rot, head_pos, new Quaternion(), delta_time);
+            }
         }
         else
         {
             Debug.Log("Initializing...");
             GameObject local_obj = Instantiate(prefab, pos.PosToVec(), pos.RotToQuat());
+            if (useAvatar)
+            {
+                local_obj.SetActive(false);
+            }
             local_obj.transform.GetChild(0).GetComponent<TextMeshPro>().text = id;
             demoDict[id] = new LiveDemoGroup();
             demoDict[id].AddDemo(local_obj);
             //Debug.Log("Initialize with trackHands: " + trackHands);
             if (trackHands)
             {
+                //int joint_id = 0;
                 foreach (HandJoint joint in handPos.joints)
                 {
+                    //joint_id++;
                     HeadPos jointPos = joint.pos;
                     Debug.Log(jointPos.PosToVec());
                     GameObject local_hand_obj;
@@ -160,11 +224,27 @@ public class LiveDemonstrator : MonoBehaviour
                     }
                     else
                     {
+                        /*
+                        if (joint.part == "R_Wrist")
+                        {
+                            right_id = joint_id;
+                        }
+                        else if (joint.part == "L_Wrist")
+                        {
+                            left_id = joint_id;
+                        }
+                        */
                         local_hand_obj = Instantiate(handJointPrefab, jointPos.PosToVec(), jointPos.RotToQuat());
                     }
                     demoDict[id].AddDemo(local_hand_obj);
                 }
                 demoDict[id].trackHands = true;
+            }
+            demoDict[id].avatarEnabled = useAvatar;
+            if (useAvatar)
+            {
+                GameObject avatar = Instantiate(avatarPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+                demoDict[id].avatar = avatar;
             }
         }
     }
@@ -175,9 +255,11 @@ public class LiveDemonstrator : MonoBehaviour
         {
             if (!keys.Contains(item.Key))
             {
+                Destroy(item.Value.avatar);
                 foreach (LiveDemoItem group_item in item.Value.item)
                 {
                     Destroy(group_item.obj);
+                    
                     StopCoroutine(group_item.co);
                 }
                 demoDict.Remove(item.Key);
@@ -200,6 +282,7 @@ public class LiveDemonstrator : MonoBehaviour
     {
         foreach (KeyValuePair<string, LiveDemoGroup> item in demoDict)
         {
+            Destroy(item.Value.avatar);
             foreach (LiveDemoItem group_item in item.Value.item)
             {
                 Destroy(group_item.obj);

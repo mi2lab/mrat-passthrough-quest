@@ -155,6 +155,16 @@ public class HeadPos
         FromTransform(t);
     }
 
+    public HeadPos(Vector3 pos, Quaternion rot)
+    {
+        posX = pos.x;
+        posY = pos.y;
+        posZ = pos.z;
+        rotX = rot.eulerAngles.x;
+        rotY = rot.eulerAngles.y;
+        rotZ = rot.eulerAngles.z;
+    }
+
     public HeadPos(Dictionary<string, object> d)
     {
         FromDictionary(d);

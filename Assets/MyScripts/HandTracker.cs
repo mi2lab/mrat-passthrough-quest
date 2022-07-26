@@ -87,7 +87,7 @@ public class HandTracker : MonoBehaviour
         }
         else
         {
-            retList.Add(new HandJoint(t));
+            retList.Add(new HandJoint(t, t.name));
         }
         //Debug.Log(retList.ToString());
         return retList;
