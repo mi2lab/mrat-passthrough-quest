@@ -41,11 +41,11 @@ MRAT-Passthrough packages can be installed to an existing project for analysis p
 2. Drag OVRHandPrefab twice to the scene and set one of them to be a child of `LeftHandAnchor` and `RightHandAnchor` under `OVRCameraRig`.
 3. Set all `hand type`, `skeleton type`, `mesh type` within `OVRHandPrefab` under `RightHandAnchor` to `Hand right`.
 1. For the two `OVRHandPrefab`, set the following components to be inactive:
-   1. OVR Skeleton Renderer
-   2. OVR Mesh
-   3. OVR Mesh Renderer
-   4. Skinned Mesh Renderer
-2. In drop down menu `Oculus -> tools`, create android_manifest.xml. If it already exits, then use update android_manifest.xml.
+   - OVR Skeleton Renderer
+   - OVR Mesh
+   - OVR Mesh Renderer
+   - Skinned Mesh Renderer
+1. In drop down menu `Oculus -> tools`, create android_manifest.xml. If it already exits, then use update android_manifest.xml.
 
 ## Configure MRTK
 1. In Unity drop down menu `Mixed Reality -> toolkit -> Utilities`, use `Configure Project for MRTK` to configure.
