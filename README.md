@@ -45,7 +45,8 @@ MRAT-Passthrough packages can be installed to an existing project for analysis p
    - OVR Mesh
    - OVR Mesh Renderer
    - Skinned Mesh Renderer
-1. In drop down menu `Oculus -> tools`, create android_manifest.xml. If it already exits, then use update android_manifest.xml.
+1. Under `OVRCameraRig`, choose add components, then search OVRPassthroughLayer and add that to `OVRCameraRig`.
+2. In drop down menu `Oculus -> tools`, create android_manifest.xml. If it already exits, then use update android_manifest.xml.
 
 ## Configure MRTK
 1. In Unity drop down menu `Mixed Reality -> toolkit -> Utilities`, use `Configure Project for MRTK` to configure.
