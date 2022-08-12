@@ -4,30 +4,34 @@ using UnityEngine;
 
 public class PassthroughManager : MonoBehaviour
 {
+    [HideInInspector]
     public OVRPassthroughLayer passthrough;
-    public OVRInput.Button button;
-    public OVRInput.Controller controller;
+    //public OVRInput.Button button;
+    //public OVRInput.Controller controller;
 
-    public GameObject virtualRoom;
+    [HideInInspector]
+    public GameObject VirtualEnv;
 
     // Start is called before the first frame update
     void Start()
     {
         passthrough.hidden = true;
-        virtualRoom.SetActive(true);
+        VirtualEnv.SetActive(true);
     }
 
     // Update is called once per frame
     void Update()
     {
+        /*
         if(OVRInput.GetDown(button, controller))
         {
             passthrough.hidden = !passthrough.hidden;
         }
+        */
     }
 
     public void ToggleEnv(){
         passthrough.hidden = !passthrough.hidden;
-        virtualRoom.SetActive(passthrough.hidden);
+        VirtualEnv.SetActive(passthrough.hidden);
     }
 }

@@ -21,8 +21,8 @@ public class AccountLogger : MonoBehaviour
     [HideInInspector] public bool inputLegal = false;
     public TextMeshPro targetText;
 
-    public string testInput = "";
-    public bool testFinished = false;
+    // public string testInput = "";
+    //public bool testFinished = false;
 
     public void ToggleFinished()
     {
@@ -171,6 +171,7 @@ public class AccountLogger : MonoBehaviour
                 targetText.text = inputText;
             }
         }
+        /*
         if (testFinished)
         {
             inputText = testInput;
@@ -178,5 +179,6 @@ public class AccountLogger : MonoBehaviour
             ToggleFinished();
             testFinished = false;
         }
+        */
     }
 }

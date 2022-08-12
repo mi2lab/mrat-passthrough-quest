@@ -8,79 +8,12 @@ using Firebase.Extensions;
 
 using Firebase.Firestore;
 
-/*
-[System.Serializable]
-public class LivePos
-{
-    private Dictionary<int, HeadPos> headPosList = new Dictionary<int, HeadPos>();
-
-    public void Add(int id)
-    {
-        if (!headPosList.ContainsKey(id))
-        {
-            headPosList.Add(id, new HeadPos());
-        }
-    }
-
-    public void Update(int id, HeadPos pos)
-    {
-        if (headPosList.ContainsKey(id))
-        {
-            headPosList[id] = pos;
-        }
-    }
-
-    public void Update(Dictionary<int, HeadPos> dict)
-    {
-        foreach (KeyValuePair<int, HeadPos> pos in dict)
-        {
-            headPosList[pos.Key] = pos.Value;
-        }
-    }
-
-    public void Remove(int id)
-    {
-        if (headPosList.ContainsKey(id))
-        {
-            headPosList.Remove(id);
-        }
-    }
-
-    public HeadPos GetValue(int id)
-    {
-        if (headPosList.ContainsKey(id))
-        {
-            return headPosList[id];
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public List<int> GetKeys()
-    {
-        return new List<int>(headPosList.Keys);
-    }
-
-    public List<int> GetKeys(int id)
-    {
-        List<int> ret = new List<int>(headPosList.Keys);
-        ret.Remove(id);
-        return ret;
-    }
-
-    public void Clear()
-    {
-        headPosList.Clear();
-    }
-}
-*/
-
 public class DatabaseSync : MonoBehaviour
 {
+    [HideInInspector]
     public GameObject target;
     public float deltaTime = 1;
+    [HideInInspector]
     public string personalId = null;
     //public GameObject syncIndicator;
     private bool synchronizing = false;
@@ -96,18 +29,21 @@ public class DatabaseSync : MonoBehaviour
     //private LivePos otherPos = new LivePos();
     private bool downSynchronizing = false;
     private Coroutine downCo;
+    [HideInInspector]
     public LiveDemonstrator demo;
 
+    [HideInInspector]
     public AccountLogger logger;
     private bool loggerRunning = false;
     private Coroutine loggerCo;
-    public string tmpPersonalId = "";
 
-    public bool test_up_sync = false;
-    public bool test_down_sync = false;
-    public bool test_account_setup = false;
+    //public bool test_up_sync = false;
+    //public bool test_down_sync = false;
+    //public bool test_account_setup = false;
 
+    [HideInInspector]
     public bool trackHands = false;
+    [HideInInspector]
     public HandTracker handTracker;
 
     void AccumulatePos(string pos)
@@ -308,7 +244,6 @@ public class DatabaseSync : MonoBehaviour
         string localId = logger.GetAccount();
         if (localId != "")
         {
-            //tmpPersonalId = localId;
             personalId = localId;
             Debug.Log("Result: " + personalId);
         }
@@ -326,7 +261,6 @@ public class DatabaseSync : MonoBehaviour
         }
         Debug.Log("Logger finished");
         string localId = logger.GetAccount();
-        //tmpPersonalId = localId;
         personalId = localId;
         Debug.Log("Result: " + personalId);
         loggerRunning = false;
@@ -342,7 +276,7 @@ public class DatabaseSync : MonoBehaviour
     {
         if (!loggerRunning)
         {
-            Debug.Log("Try login");
+            //Debug.Log("Try login");
             logger.CreateAccount();
             StartCoroutine(WaitLogin());
             loggerRunning = true;
@@ -363,25 +297,19 @@ public class DatabaseSync : MonoBehaviour
         StartCoroutine(WaitLoginGenerate());
     }
 
+    public bool isUpSynchronizing()
+    {
+        return synchronizing;
+    }
+
+    public bool isDownSynchronizing()
+    {
+        return downSynchronizing;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (test_up_sync)
-        {
-            ToggleSync();
-            test_up_sync = false;
-        }
-        if (test_down_sync)
-        {
-            ToggleDownSync();
-            test_down_sync = false;
-        }
-        if (test_account_setup)
-        {
-            ToggleLogIn();
-            test_account_setup = false;
-        }
-
         //handTracker.trackEnabled = trackHands;
         handTracker.deltaTime = deltaTime;
     }

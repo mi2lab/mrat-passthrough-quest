@@ -6,8 +6,9 @@ public class HandTracker : MonoBehaviour
 {
     public string targetRHandName = "R_Hand_MRTK_Rig";
     public string targetLHandName = "L_Hand_MRTK_Rig";
-    [HideInInspector] public float deltaTime = 1f;
-    [HideInInspector] private bool trackEnabled = true;
+    [HideInInspector] 
+    public float deltaTime = 1f;
+    private bool trackEnabled = true;
     private bool trackRunning = false;
     private Coroutine tracking_co;
     private GameObject trackedLHand;

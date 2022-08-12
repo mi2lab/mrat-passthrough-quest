@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class RecordReplayManager : MonoBehaviour
 {
-
+    [HideInInspector]
     public Recorder recorder;
+    [HideInInspector]
     public Replayer replayer;
 
+    /*
     public bool test_replay = false;
     public bool test_recording = false;
     public bool test_replay_pause = false;
     public bool test_sync_database = false;
+    */
 
     public void ToggleRecording()
     {
@@ -66,6 +69,7 @@ public class RecordReplayManager : MonoBehaviour
 
     public void Update()
     {
+        /*
         if (test_replay)
         {
             ToggleReplay();
@@ -86,6 +90,7 @@ public class RecordReplayManager : MonoBehaviour
             UpdateReplay();
             test_sync_database = false;
         }
+        */
     }
 
 }

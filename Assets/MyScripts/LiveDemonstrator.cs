@@ -20,15 +20,11 @@ public class LiveDemoGroup
 
     public void DiscardOtherThanHead()
     {
-        //LiveDemoItem tmp = item[0];
         for (int i = item.Count - 1; i > 0; i--)
         {
             item[i].End();
             item.RemoveAt(i);
         }
-        //item[]
-        //item.Clear();
-        //item.Add(tmp);
     }
 
 }
@@ -58,16 +54,17 @@ public class LiveDemoItem
 
 public class LiveDemonstrator : MonoBehaviour
 {
+    [HideInInspector]
     public GameObject prefab;
-    //private Dictionary<int, GameObject> itemDict = new Dictionary<int, GameObject>();
-    //private Dictionary<int, Coroutine> coDict = new Dictionary<int, Coroutine>();
     private Dictionary<string, LiveDemoGroup> demoDict = new Dictionary<string, LiveDemoGroup>();
-    //private Dictionary<int, bool> flagDict = new Diction
 
+    [HideInInspector]
     public GameObject handJointPrefab;
+    [HideInInspector]
     public GameObject handJointTipPrefab;
 
-    public GameObject avatarPrefab;
+    // replay with avatar, experimental function, see manual
+    private GameObject avatarPrefab = null;
 
     IEnumerator moveTowards(GameObject obj, HeadPos tar, float delta_time)
     {
@@ -78,20 +75,15 @@ public class LiveDemonstrator : MonoBehaviour
         float localTime = 0;
         while (localTime < delta_time)
         {
-            //Debug.Log("#");
-            //Debug.Log(localTime);
-            //Debug.Log(delta_time);
             obj.transform.position = Vector3.Lerp(initPos, localPos, localTime / delta_time);
             obj.transform.rotation = Quaternion.Lerp(initRot, localRot, localTime / delta_time);
             localTime += Time.deltaTime;
-            yield return null;// new WaitForSeconds(Time.deltaTime);
+            yield return null;
         }
-        //break;
     }
 
     public void UpdateItem(string id, HeadPos pos, float delta_time, bool trackHands = false, HandPos handPos = null, bool useAvatar = true)
     {
-        //Debug.Log("Updating item");
         if (demoDict.ContainsKey(id))
         {
             if (demoDict[id].running)
@@ -103,33 +95,14 @@ public class LiveDemonstrator : MonoBehaviour
                 demoDict[id].running = false;
             }
 
-            /*
-            if (demoDict[id].trackHands)
-            {
-                if (left_id >= 1 && left_id < demoDict[id].item.Count)
-                {
-                    left_pos = handPos.joints[left_id - 1].pos.PosToVec();
-                    left_rot = handPos.joints[left_id - 1].pos.RotToQuat();
-                }
-                if (right_id >= 1 && right_id < demoDict[id].item.Count)
-                {
-                    right_pos = handPos.joints[right_id - 1].pos.PosToVec();
-                    right_rot = handPos.joints[right_id - 1].pos.RotToQuat();
-                }
-            }
-            */
             if (trackHands && handPos == null)
             {
                 demoDict[id].DiscardOtherThanHead();
             }
             else if (trackHands && handPos!= null && (handPos.joints.Count != (demoDict[id].item.Count - 1) || ( !demoDict[id].trackHands))) {
-                //Debug.Log("Hand track off in dict, turn it on...");
                 demoDict[id].DiscardOtherThanHead();
-                //int joint_id = 0;
                 foreach (HandJoint joint in handPos.joints)
                 {
-                    //joint_id++;
-                    //Debug.Log(++count);
                     HeadPos jointPos = joint.pos;
                     Debug.Log(jointPos.PosToVec());
                     GameObject local_obj;
@@ -139,21 +112,10 @@ public class LiveDemonstrator : MonoBehaviour
                     }
                     else
                     {
-                        /*
-                        if (joint.part == "R_Wrist")
-                        {
-                            right_id = joint_id;
-                        }
-                        else if (joint.part == "L_Wrist")
-                        {
-                            left_id = joint_id;
-                        }
-                        */
                         local_obj = Instantiate(handJointPrefab, jointPos.PosToVec(), jointPos.RotToQuat());
                     }
                     demoDict[id].AddDemo(local_obj);
                 }
-                //Debug.Log("Hand track items added finished");
                 demoDict[id].trackHands = true;
             }
             else if (!trackHands && demoDict[id].trackHands)
@@ -208,13 +170,10 @@ public class LiveDemonstrator : MonoBehaviour
             local_obj.transform.GetChild(0).GetComponent<TextMeshPro>().text = id;
             demoDict[id] = new LiveDemoGroup();
             demoDict[id].AddDemo(local_obj);
-            //Debug.Log("Initialize with trackHands: " + trackHands);
             if (trackHands)
             {
-                //int joint_id = 0;
                 foreach (HandJoint joint in handPos.joints)
                 {
-                    //joint_id++;
                     HeadPos jointPos = joint.pos;
                     Debug.Log(jointPos.PosToVec());
                     GameObject local_hand_obj;
@@ -224,16 +183,6 @@ public class LiveDemonstrator : MonoBehaviour
                     }
                     else
                     {
-                        /*
-                        if (joint.part == "R_Wrist")
-                        {
-                            right_id = joint_id;
-                        }
-                        else if (joint.part == "L_Wrist")
-                        {
-                            left_id = joint_id;
-                        }
-                        */
                         local_hand_obj = Instantiate(handJointPrefab, jointPos.PosToVec(), jointPos.RotToQuat());
                     }
                     demoDict[id].AddDemo(local_hand_obj);
@@ -292,13 +241,11 @@ public class LiveDemonstrator : MonoBehaviour
         demoDict.Clear();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         

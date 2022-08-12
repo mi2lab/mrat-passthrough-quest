@@ -224,6 +224,7 @@ public class RecordingDatabse : MonoBehaviour
     public HashSet<string> recordingTags = new HashSet<string>();
     private DatabaseReference reference;
 
+    [HideInInspector]
     public DatabaseSync database;
 
     public string GetId()

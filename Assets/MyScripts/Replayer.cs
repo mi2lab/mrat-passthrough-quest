@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Replayer : MonoBehaviour
 {
-
+    [HideInInspector]
     public GameObject HeadPrefab;
-    //private HeadPosSeriesList headPosRecordings = new HeadPosSeriesList();
     private HeadPosSeries headPosRecording = new HeadPosSeries();
     private GameObject HeadObject;
     private Coroutine replayingCoroutine;
@@ -18,7 +18,9 @@ public class Replayer : MonoBehaviour
     public GameObject replayingIndicator;
     private Coroutine replayingIndicatorCoroutine;
 
+    [HideInInspector]
     public ReplayerControl control;
+    [HideInInspector]
     public RecordingDatabse database;
 
     public GameObject snapshotContainer;
@@ -29,11 +31,14 @@ public class Replayer : MonoBehaviour
     private bool snapshotCoroutineRunning = false;
 
     private LiveDemoGroup demo = new LiveDemoGroup();
+    [HideInInspector]
     public GameObject handJointTipPrefab;
+    [HideInInspector]
     public GameObject handJointPrefab;
 
-    public GameObject avatarPrefab;
-    private bool useAvatar = true;
+    // replay with avatar, experimental function, see manual
+    private GameObject avatarPrefab = null; 
+    private bool useAvatar = false;
 
     public void SetCurrentId(int id)
     {
@@ -64,33 +69,15 @@ public class Replayer : MonoBehaviour
         float localTime = 0;
         while (localTime < delta_time)
         {
-            //Debug.Log("#");
-            //Debug.Log(localTime);
-            //Debug.Log(delta_time);
             obj.transform.position = Vector3.Lerp(initPos, localPos, localTime / delta_time);
             obj.transform.rotation = Quaternion.Lerp(initRot, localRot, localTime / delta_time);
             localTime += Time.deltaTime;
-            yield return null;// new WaitForSeconds(Time.deltaTime);
+            yield return null;
         }
-        //break;
     }
 
     public void UpdateItem(HeadPos pos, float delta_time, bool trackHands = false, HandPos handPos = null)
     {
-        /*
-        Debug.Log("Update Hand Pos");
-        if (handPos != null)
-        {
-            Debug.Log(handPos.joints.Count);
-        }
-        else
-        {
-            Debug.Log("NULL!");
-        }
-        Debug.Log(demo.item.Count);
-        */
-
-        //Debug.Log("Updating item");
         if (demo.running)
         {
             foreach (LiveDemoItem item in demo.item)
@@ -105,12 +92,9 @@ public class Replayer : MonoBehaviour
         }
         else if (trackHands && handPos != null && (handPos.joints.Count != (demo.item.Count - 1) || (!demo.trackHands)))
         {
-            //Debug.Log("Hand track off in dict, turn it on...");
             demo.DiscardOtherThanHead();
-            //Debug.Log("Hand track off in dict, turn it on...");
             foreach (HandJoint joint in handPos.joints)
             {
-                //Debug.Log(++count);
                 HeadPos jointPos = joint.pos;
                 Debug.Log(jointPos.PosToVec());
                 GameObject local_obj;
@@ -124,7 +108,6 @@ public class Replayer : MonoBehaviour
                 }
                 demo.AddDemo(local_obj);
             }
-            //Debug.Log("Hand track items added finished");
             demo.trackHands = true;
         }
         else if (!trackHands && demo.trackHands)
@@ -132,18 +115,6 @@ public class Replayer : MonoBehaviour
             demo.DiscardOtherThanHead();
             demo.trackHands = false;
         }
-
-        /*
-        if (handPos != null)
-        {
-            Debug.Log(handPos.joints.Count);
-        }
-        else
-        {
-            Debug.Log("NULL!");
-        }
-        Debug.Log(demo.item.Count);
-        */
 
         demo.running = true;
         //head
@@ -212,7 +183,10 @@ public class Replayer : MonoBehaviour
             yield return new WaitForSeconds(headPosRecording.info.deltaTime);
         }
         demo.running = false;
-        Destroy(demo.avatar);
+        if (demo.avatarEnabled)
+        {
+            Destroy(demo.avatar);
+        }
         foreach (LiveDemoItem group_item in demo.item)
         {
             Destroy(group_item.obj);
@@ -225,53 +199,8 @@ public class Replayer : MonoBehaviour
         yield return null;
     }
 
-        /*
-        IEnumerator ReplayingCoroutine(float delta_time = 1.0f)
-        {
-            for (int i = 1; i < headPosRecording.headPosSeries.Count; i++)
-            {
-                while (coroutinePause)
-                {
-                    yield return null;
-                }
-                Vector3 localPos = headPosRecording.headPosSeries[i].PosToVec();
-                Quaternion localRot = headPosRecording.headPosSeries[i].RotToQuat();
 
-                List<Vector3> localHandPos = new List<Vector3>();
-                List<Quaternion> localHandRot = new List<Quaternion>();
-                List<string> localHandTag = new List<string>();
-                foreach (HandJoint joint in headPosRecording.handPosSeries[i].joints)
-                {
-                    localHandPos.Add(joint.pos.PosToVec());
-                    localHandRot.Add(joint.pos.RotToQuat());
-                    localHandTag.Add(joint.part);
-                }
-
-                Vector3 initPos = HeadObject.transform.position;
-                Quaternion initRot = HeadObject.transform.rotation;
-                float localTime = 0;
-                while (localTime < delta_time)
-                {
-                    //Debug.Log("#");
-                    //Debug.Log(localTime);
-                    //Debug.Log(delta_time);
-                    HeadObject.transform.position = Vector3.Lerp(initPos, localPos, localTime / delta_time);
-                    HeadObject.transform.rotation = Quaternion.Lerp(initRot, localRot, localTime / delta_time);
-                    localTime += Time.deltaTime;
-                    yield return null;// new WaitForSeconds(Time.deltaTime);
-                }
-                //break;
-            }
-            Destroy(HeadObject);
-            StopCoroutine(replayingIndicatorCoroutine);
-            replayingIndicator.SetActive(false);
-            coroutineRunning = false;
-            coroutinePause = false;
-            yield return null;
-        }
-        */
-
-        public bool isReplaying()
+    public bool isReplaying()
     {
         return coroutineRunning;
     }
@@ -295,10 +224,14 @@ public class Replayer : MonoBehaviour
 
     public bool StartReplay()
     {
+        if (snapshotCoroutineRunning)
+        {
+            StopCoroutine(snapshotCoroutine);
+            ClearSnapshot();
+            snapshotCoroutineRunning = false;
+        }
         if (!coroutineRunning)
         {
-            //string headPosJson = System.IO.File.ReadAllText(Application.persistentDataPath + "/HeadPosData.json");
-            //headPosRecording = JsonUtility.FromJson<HeadPosSeries>(headPosJson);
             if (currentId >= database.headPosRecordings.Count())
             {
                 return false;
@@ -312,16 +245,14 @@ public class Replayer : MonoBehaviour
             {
                 local_obj.SetActive(false);
             }
-            //local_obj.transform.GetChild(0).GetComponent<TextMeshPro>().text = id;
+            local_obj.transform.GetChild(0).GetComponent<TextMeshPro>().text = headPosRecording.info.id;
             demo = new LiveDemoGroup();
             demo.AddDemo(local_obj);
-            //Debug.Log("Initialize with trackHands: " + trackHands);
             if (headPosRecording.useHandTrack)
             {
                 foreach (HandJoint joint in headPosRecording.handPosSeries[0].joints)
                 {
                     HeadPos jointPos = joint.pos;
-                    //Debug.Log(jointPos.PosToVec());
                     GameObject local_hand_obj;
                     if (joint.part == "tip")
                     {
@@ -336,9 +267,16 @@ public class Replayer : MonoBehaviour
                 demo.trackHands = true;
             }
 
-            demo.avatarEnabled = true;
-            GameObject avatar = Instantiate(avatarPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
-            demo.avatar = avatar;
+            if (useAvatar)
+            {
+                demo.avatarEnabled = true;
+                GameObject avatar = Instantiate(avatarPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+                demo.avatar = avatar;
+            }
+            else
+            {
+                demo.avatarEnabled = false;
+            }
 
             replayingCoroutine = StartCoroutine(ReplayingCoroutine());
             replayingIndicatorCoroutine = StartCoroutine(ReplayingIndicatorCoroutine());
@@ -346,6 +284,11 @@ public class Replayer : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public bool isPaused()
+    {
+        return coroutinePause;
     }
 
     public void PauseReplay()
@@ -362,10 +305,10 @@ public class Replayer : MonoBehaviour
         if (coroutineRunning)
         {
             StopCoroutine(replayingCoroutine);
-            //StopCoroutine(replayingIndicatorCoroutine);
-            //replayingIndicator.SetActive(false);
-            //coroutineRunning = false;
-            //coroutinePause = false;
+            if (demo.avatarEnabled)
+            {
+                Destroy(demo.avatar);
+            }
             foreach (LiveDemoItem group_item in demo.item)
             {
                 Destroy(group_item.obj);
@@ -378,32 +321,25 @@ public class Replayer : MonoBehaviour
         }
     }
 
-    IEnumerator SnapshotCoroutine(float display_time = 5f, float keep_time = 5f)
+    void ClearSnapshot()
     {
-        snapshotCoroutineRunning = true;
-        //if (snapshotContainer.GetComponent<LineRenderer>())
-        //{
-        //    Destroy(snapshotContainer.GetComponent<LineRenderer>());
-        //}
         lineRenderer.positionCount = 0;
-        //lineRenderer.SetPositions(null);
-        
         foreach (Transform child in snapshotContainer.transform)
         {
             GameObject.Destroy(child.gameObject);
         }
+    }
+
+    IEnumerator SnapshotCoroutine(float display_time = 5f, float keep_time = 5f)
+    {
+        snapshotCoroutineRunning = true;
+        ClearSnapshot();
         Queue<GameObject> snapQueue = new Queue<GameObject>(headPosRecording.headPosSeries.Count - 1);
         Queue<Vector3> pointQueue = new Queue<Vector3>();
         Queue<Vector3> checkQueue = new Queue<Vector3>();
         Debug.Log(headPosRecording.headPosSeries.Count);
-        //int keep_length = Mathf.RoundToInt(keep_time / headPosRecording.info.deltaTime);
         for (int i = 0; i < headPosRecording.headPosSeries.Count; i++)
         {
-            //if (i > keep_length) {
-            //    GameObject obj = snapQueue.Dequeue();
-            //    Destroy(obj);
-            //    pointQueue.Dequeue();
-            //}
             Vector3 localPos = headPosRecording.headPosSeries[i].PosToVec();
             Quaternion localRot = headPosRecording.headPosSeries[i].RotToQuat();
 
@@ -430,7 +366,6 @@ public class Replayer : MonoBehaviour
             checkQueue.Enqueue(localPos);
 
             pointQueue.Enqueue(localPos);
-            //Debug.Log(pointQueue.Count);
             lineRenderer.positionCount = pointQueue.Count;
             lineRenderer.SetPositions(pointQueue.ToArray());
             yield return new WaitForSeconds(display_time / headPosRecording.headPosSeries.Count);
@@ -450,9 +385,6 @@ public class Replayer : MonoBehaviour
         }
         snapshotCoroutineRunning = false;
         lineRenderer.positionCount = 0;
-        //yield return null;
-        //yield return new WaitForSeconds(10f) ;
-        //Destroy(snapshotContainer.GetComponent<LineRenderer>());
         yield return null;
     }
 
@@ -471,7 +403,6 @@ public class Replayer : MonoBehaviour
         return true;
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         lineRenderer = snapshotContainer.AddComponent<LineRenderer>();
@@ -488,7 +419,6 @@ public class Replayer : MonoBehaviour
         lineRenderer.useWorldSpace = true;
     }
 
-    // Update is called once per frame
     void Update()
     {
         

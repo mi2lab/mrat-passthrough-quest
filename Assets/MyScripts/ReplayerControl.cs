@@ -5,6 +5,7 @@ using TMPro;
 
 public class ReplayerControl : MonoBehaviour
 {
+    
     public Replayer replayer;
     public TextMeshPro idText;
     public TextMeshPro endTimeText;
@@ -14,6 +15,7 @@ public class ReplayerControl : MonoBehaviour
     public GameObject textItemPrefab;
     private int prevSelected = -1;
 
+    [HideInInspector]
     public int currentId = 0;
 
     public void IncreaseId()

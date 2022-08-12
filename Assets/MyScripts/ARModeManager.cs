@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class ARModeManager : MonoBehaviour
 {
+    [HideInInspector]
     public GameObject phone;
+
+    [HideInInspector]
     public GameObject fov;
 
-    public Camera phoneCam;
+    //public Camera phoneCam;
+    [HideInInspector]
     public Camera fovCam;
+
+    [HideInInspector]
+    public string[] masks;
 
     void Start()
     {
@@ -28,7 +35,7 @@ public class ARModeManager : MonoBehaviour
         fov.SetActive(phoneActive);
 
         if(fov.activeSelf){
-            fovCam.cullingMask = LayerMask.GetMask("Default", "Path3D");
+            fovCam.cullingMask = LayerMask.GetMask("Default" + masks);// "Default", "Path3D");
         }
         else{
             fovCam.cullingMask = LayerMask.GetMask("Default");

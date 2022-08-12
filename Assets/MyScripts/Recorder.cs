@@ -7,10 +7,12 @@ public class Recorder : MonoBehaviour
 {
 
     //[SerializeField] private HeadPosSeriesList headPosRecordings = new HeadPosSeriesList();
-    [SerializeField] private HeadPosSeries headPosRecording;
+    [HideInInspector] [SerializeField] 
+    private HeadPosSeries headPosRecording;
+
+    [HideInInspector]
     public GameObject target;
-    public bool test_start;
-    public bool test_end;
+
     public float recordDeltaTime = 0.2f;
     private Coroutine recordingCoroutine;
     private bool coroutineRunning = false;
@@ -18,9 +20,12 @@ public class Recorder : MonoBehaviour
     public GameObject recordingIndicator;
     private Coroutine recordingIndicatorCoroutine;
 
+    [HideInInspector]
     public Replayer replayer;
+    [HideInInspector]
     public RecordingDatabse database;
 
+    [HideInInspector]
     public HandTracker handTracker;
     public bool trackHands = false;
 
@@ -113,16 +118,7 @@ public class Recorder : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (test_start)
-        {
-            StartRecording();
-            test_start = false;
-        }
-        if (test_end)
-        {
-            StopRecording();
-            test_end = false;
-        }
+       
         //Debug.Log(System.DateTime.Now.Ticks);
     }
 }
