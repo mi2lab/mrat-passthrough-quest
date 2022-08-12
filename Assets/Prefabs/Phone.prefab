@@ -190,7 +190,7 @@ GameObject:
   - component: {fileID: 7698887417497317176}
   - component: {fileID: 7698887417497317183}
   m_Layer: 0
-  m_Name: iPhone
+  m_Name: Phone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

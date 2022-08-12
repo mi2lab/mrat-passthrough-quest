@@ -3758,7 +3758,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7698887417497317177, guid: 267d25a2e4b81994ca88b5778c338b70, type: 3}
       propertyPath: m_Name
-      value: iPhone
+      value: Phone
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 267d25a2e4b81994ca88b5778c338b70, type: 3}
