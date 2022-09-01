@@ -85,9 +85,9 @@ public class DatabaseSync : MonoBehaviour
                         HandPos handPos = handTracker.GetHandPos();
                         //Debug.Log(handPos.joints.Count);
                         //Debug.Log(handPos.joints[5].pos.PosToVec());
-                        handTracker.PrintHandPos();
+                        //handTracker.PrintHandPos();
                         string localHandPosJson = JsonUtility.ToJson(handPos);
-                        Debug.Log(localHandPosJson);
+                        //Debug.Log(localHandPosJson);
                         reference.Child("livePos").Child(personalId).Child("handTrack").SetValueAsync(localHandPosJson);
                     }
                 }
@@ -283,6 +283,8 @@ public class DatabaseSync : MonoBehaviour
         if (!loggerRunning)
         {
             //Debug.Log("Try login");
+            reference.Child("livePos").Child(personalId).RemoveValueAsync();
+            personalId = null;
             logger.CreateAccount();
             StartCoroutine(WaitLogin());
             loggerRunning = true;

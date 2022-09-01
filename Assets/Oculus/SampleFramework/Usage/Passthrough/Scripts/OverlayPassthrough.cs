@@ -24,12 +24,14 @@ public class OverlayPassthrough : MonoBehaviour
 
     void Update()
     {
+        /*
         if (OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
         {
             passthroughLayer.hidden = !passthroughLayer.hidden;
         }
 
         float thumbstickX = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch).x;
-        passthroughLayer.textureOpacity = thumbstickX * 0.5f + 0.5f;
+        passthroughLayer.textureOpacity = thumbstickX * 0.5f + 0.5f;=
+        */
     }
 }

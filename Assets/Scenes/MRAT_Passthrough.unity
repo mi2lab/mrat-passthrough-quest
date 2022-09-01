@@ -155,10 +155,10 @@ RectTransform:
   m_Father: {fileID: 526150910}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 650}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 275, y: -469.4}
+  m_SizeDelta: {x: 550, y: 650}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &75638781
 MonoBehaviour:
@@ -977,10 +977,10 @@ RectTransform:
   m_Father: {fileID: 75638780}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 54.1, y: -20}
+  m_SizeDelta: {x: 108.2, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &510822325
 MonoBehaviour:
@@ -1136,6 +1136,7 @@ MonoBehaviour:
   mratManager: {fileID: 4483444449584631087}
   text: This is an example of event triggering
   level: 1
+  test_click: 0
 --- !u!224 &526150910 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4483444448370999911, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
@@ -3329,10 +3330,10 @@ RectTransform:
   m_Father: {fileID: 526150910}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 275, y: -109.6}
+  m_SizeDelta: {x: 550, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2018210901
 MonoBehaviour:
@@ -4131,7 +4132,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4483444447537467274, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -59.8
       objectReference: {fileID: 0}
     - target: {fileID: 4483444447554855402, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
       propertyPath: passthrough
@@ -4159,7 +4160,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4483444447994827212, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4483444448017337000, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
       propertyPath: m_AnchorMax.y
@@ -4339,7 +4340,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4483444449572014968, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 0.32129416
       objectReference: {fileID: 0}
     - target: {fileID: 4483444449616557850, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
       propertyPath: m_RootOrder
@@ -4395,7 +4396,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4667772679884204415, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6237169133004424237, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
       propertyPath: m_Name
@@ -4490,7 +4491,7 @@ MonoBehaviour:
   headReplay: 0
   pauseReplay: 0
   syncDatabase: 0
-  upSync: 0
+  upSync: 1
   downSync: 0
   startLogin: 0
   userNameInput: 
@@ -4514,8 +4515,6 @@ MonoBehaviour:
   databaseManager: {fileID: 4483444449584631090}
   controlManager: {fileID: 4483444449584631089}
   applicationManager: {fileID: 4483444449584631088}
-  avatarPrefab: {fileID: 7518234139834293930, guid: e7292b57a54e1d848966c843b9618393, type: 3}
-  useAvatar: 1
 --- !u!1 &4483444449584631088 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4483444448261486633, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
@@ -4546,7 +4545,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4483444447554855401, guid: 69fcad0fca07cc24b938ea9a26e4337c, type: 3}
   m_PrefabInstance: {fileID: 4483444449584631085}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4483444449584631095
+--- !u!114 &4483444449584631115
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

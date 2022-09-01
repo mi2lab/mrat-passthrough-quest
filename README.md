@@ -103,6 +103,24 @@ The MRATManager should look like:
 
 ![fig](./Documents/images/MRatManagerConfig.png)
 
+# Solutions and Tips
+
+## Error finding SDKs when building
+In drop-down menu, go to edit -> preference -> external tools, deselect all related to JDK, then reselect them all.
+
+## MRTK simulator not working in game mode in editor
+This is probably because the tags for the left eye anchor, center eye anchor and right eye anchor are messed up. However, when the MRTK simulator is working in editor, it may not work in built packages on Oculus.
+
+## Click when pointing to skybox will result in passthrough enabled
+Remove codes within `Update()` in `OverlayPassthrough.cs`.
+
+## Multiple precompiled assemblies with the same name Newtonsoft.Json.dll error
+Remove the JsonNet plugin according to the error message in HoloKit. See [here](https://stackoverflow.com/questions/64321053/unity-multiple-precompiled-assemblies-with-the-same-name-using-external-dll).
+
+## Passthrough not working in game mode
+Passthrough only works for built in only, can’t run it in unity editor.
+
+
 # For Further Development
 ## Add New Menu
 To add a new panel in detailed window, create a new button under `MRAT -> MixedRealitySceneContent -> MainPanel -> Detailed Panel -> FunctionSelection` down to the items in viewport. See how other buttons do as examples. Then create a new menu page under `MRAT -> MixedRealitySceneContent -> MainPanel -> Detailed Panel -> Function`. Follow other panel's implementation.   
