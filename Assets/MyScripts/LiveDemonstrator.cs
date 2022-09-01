@@ -64,7 +64,8 @@ public class LiveDemonstrator : MonoBehaviour
     public GameObject handJointTipPrefab;
 
     // replay with avatar, experimental function, see manual
-    private GameObject avatarPrefab = null;
+    [HideInInspector]
+    public GameObject avatarPrefab = null;
 
     IEnumerator moveTowards(GameObject obj, HeadPos tar, float delta_time)
     {

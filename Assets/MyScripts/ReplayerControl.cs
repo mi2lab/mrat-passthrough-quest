@@ -46,7 +46,7 @@ public class ReplayerControl : MonoBehaviour
 
     public void UpdateAll()
     {
-        UpdateText();
+        //UpdateText();
         PanelUpdateText();
         UpdateReplayerId();
     }

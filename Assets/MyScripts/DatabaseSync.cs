@@ -57,6 +57,11 @@ public class DatabaseSync : MonoBehaviour
     {
         while (true)
         {
+            if (personalId == null || personalId == "")
+            {
+                yield return new WaitForSeconds(deltaTime);
+                continue;
+            }
             try
             {
                 localPos.FromTransform(target.transform);
@@ -72,6 +77,7 @@ public class DatabaseSync : MonoBehaviour
                 }
                 else
                 {
+                    reference.Child("livePos").Child(personalId).Child("delta_time").SetValueAsync(deltaTime.ToString());
                     reference.Child("livePos").Child(personalId).Child("headPos").SetValueAsync(localPosJson);
                     reference.Child("livePos").Child(personalId).Child("useHandTrack").SetValueAsync(trackHands.ToString());
                     if (trackHands)
@@ -242,7 +248,7 @@ public class DatabaseSync : MonoBehaviour
         }
         Debug.Log("Logger finished");
         string localId = logger.GetAccount();
-        if (localId != "")
+        if (localId != "" && localId != null)
         {
             personalId = localId;
             Debug.Log("Result: " + personalId);

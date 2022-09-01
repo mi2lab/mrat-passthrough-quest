@@ -102,3 +102,18 @@ TargetLeftHandName and TargetRightHandName is the name of the hand object that w
 The MRATManager should look like:
 
 ![fig](./Documents/images/MRatManagerConfig.png)
+
+# For Further Development
+## Add New Menu
+To add a new panel in detailed window, create a new button under `MRAT -> MixedRealitySceneContent -> MainPanel -> Detailed Panel -> FunctionSelection` down to the items in viewport. See how other buttons do as examples. Then create a new menu page under `MRAT -> MixedRealitySceneContent -> MainPanel -> Detailed Panel -> Function`. Follow other panel's implementation.   
+In `ControlManager`, add new items to both key and val in order, and the menu mapping will be set up.
+
+## Trigger New Events
+To trigger an event, call `TriggerEvent(string text, int level = 0)` in `MRATManager` class. The detailed explanation is in notes.
+
+# Experimental Functions
+## Avatar
+This project is embedded with Oculus Avatar SDK and have fully functioning scripts that support the avatar function. However, the function is not enabled for convenient installation to other projects. If the avatar function is needed, please follow the steps below:
+
+1. Open `avatarPrefab` as prefab, set `AvatarSdkManagerHorizon` and `AvatarEntity` to active. Save prefab.
+1. In `MRATManager`, make sure the `avatarPrefab` and `useAvatar` is set to public. Then in unity inspector panel, find the `MRATManager`. Drag the Avatar prefab in Prefab folder to the `avatarPrefab`. Set the `useAvatar` to be true.

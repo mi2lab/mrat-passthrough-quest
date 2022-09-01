@@ -83,8 +83,14 @@ public class MRATManager : MonoBehaviour
     private DatabaseSync sDB;
     private LiveDemonstrator liveD;
     private AccountLogger accL;
+    private EventManager eM;
 
     private bool set = false;
+
+    [Space(10)]
+    [Header("Experimental")]
+    private GameObject avatarPrefab = null;
+    private bool useAvatar = false;
 
     void Awake()
     {
@@ -126,6 +132,8 @@ public class MRATManager : MonoBehaviour
         repE.HeadPrefab = headPrefab;
         repE.handJointPrefab = jointPrefab;
         repE.handJointTipPrefab = jointTipPrefab;
+        repE.avatarPrefab = avatarPrefab;
+        repE.useAvatar = useAvatar;
 
         repC.replayer = repE;
 
@@ -142,9 +150,12 @@ public class MRATManager : MonoBehaviour
         liveD.prefab = headPrefab;
         liveD.handJointPrefab = jointPrefab;
         liveD.handJointTipPrefab = jointTipPrefab;
+        liveD.avatarPrefab = avatarPrefab;
 
         hT.targetLHandName = targetLeftHandName;
         hT.targetRHandName = targetRightHandName;
+
+        eM = databaseManager.GetComponent<EventManager>();
     }
 
     void Update()
@@ -218,5 +229,23 @@ public class MRATManager : MonoBehaviour
         downSyncing = sDB.isDownSynchronizing();
         liveSyncTrackHandsInd = sDB.trackHands;
         userName = sDB.personalId;
+    }
+
+    //APIs
+
+    /* 
+     * 
+     * Call this function to trigger an event. The level is set to display in different color on web end:
+     * 0: Log
+     * 1: Warning
+     * 2: Error
+     * Other: Customed, you can change them in _quest_mrat_server repo files.
+     * 
+     * See EventTriggerExample.cs for help.
+     * 
+     */
+    public void TriggerEvent(string text, int level = 0)
+    {
+        eM.TriggerEvent(text, this.userName, level);
     }
 }

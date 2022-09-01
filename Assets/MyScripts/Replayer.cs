@@ -37,8 +37,10 @@ public class Replayer : MonoBehaviour
     public GameObject handJointPrefab;
 
     // replay with avatar, experimental function, see manual
-    private GameObject avatarPrefab = null; 
-    private bool useAvatar = false;
+    [HideInInspector]
+    public GameObject avatarPrefab = null;
+    [HideInInspector]
+    public bool useAvatar = false;
 
     public void SetCurrentId(int id)
     {

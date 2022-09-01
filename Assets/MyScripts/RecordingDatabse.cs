@@ -238,6 +238,9 @@ public class RecordingDatabse : MonoBehaviour
         reference.Child("recordings").Child(info.ToKey()).Child("info").SetValueAsync(infoJson);
         reference.Child("recordings").Child(info.ToKey()).Child("trackHands").SetValueAsync(trackHand.ToString());
         reference.Child("recordings").Child(info.ToKey()).Child("finished").SetValueAsync("False");
+        //reference.Child("recordings_info_list").Child(info.ToKey()).Child("info").SetValueAsync(infoJson);
+        //reference.Child("recordings_info_list").Child(info.ToKey()).Child("trackHands").SetValueAsync(trackHand.ToString());
+        reference.Child("recordings_info_list").Child(info.ToKey()).Child("finished").SetValueAsync("False");
     }
 
     public void InsertOnlinePos(HeadPosInfo info, HeadPos pos, bool trackHand = false, HandPos handPos = null)
@@ -257,6 +260,7 @@ public class RecordingDatabse : MonoBehaviour
         string infoJson = JsonUtility.ToJson(info);
         reference.Child("recordings").Child(info.ToKey()).Child("info").SetValueAsync(infoJson);
         reference.Child("recordings").Child(info.ToKey()).Child("finished").SetValueAsync("True");
+        reference.Child("recordings_info_list").Child(info.ToKey()).Child("finished").SetValueAsync("True");
     }
 
     public void Save()
