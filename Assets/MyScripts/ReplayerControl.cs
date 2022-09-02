@@ -46,7 +46,7 @@ public class ReplayerControl : MonoBehaviour
 
     public void UpdateAll()
     {
-        //UpdateText();
+        UpdateText();
         PanelUpdateText();
         UpdateReplayerId();
     }
@@ -57,6 +57,7 @@ public class ReplayerControl : MonoBehaviour
         {
             GameObject.Destroy(child.gameObject);
         }
+        //Debug.Log(replayer.GetPlayListLength());
         for (int i = 0; i < replayer.GetPlayListLength(); i ++)
         {
             AddTextItem(i);
@@ -67,6 +68,7 @@ public class ReplayerControl : MonoBehaviour
     void AddTextItem(int id)
     {
         HeadPosInfo localInfo = replayer.GetReplayInfo(id);
+        //Debug.Log(localInfo);
         //idText.text = (currentId + 1).ToString() + " / " + replayer.GetPlayListLength().ToString();
         System.DateTime localDate = new System.DateTime((long)localInfo.endTime);
         string endTime = localDate.ToString("G");
@@ -108,7 +110,7 @@ public class ReplayerControl : MonoBehaviour
     {
         if (id >= 0 && id < textGrid.transform.childCount)
         {
-            Debug.Log(textGrid.transform.childCount);
+            //Debug.Log(textGrid.transform.childCount);
             textGrid.transform.GetChild(id).GetChild(0).gameObject.SetActive(true);
         }
     }
