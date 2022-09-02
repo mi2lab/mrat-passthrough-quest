@@ -122,12 +122,18 @@ Passthrough only works for built in only, can’t run it in unity editor.
 
 
 # For Further Development
-## Add New Menu
+## Add new menu
 To add a new panel in detailed window, create a new button under `MRAT -> MixedRealitySceneContent -> MainPanel -> Detailed Panel -> FunctionSelection` down to the items in viewport. See how other buttons do as examples. Then create a new menu page under `MRAT -> MixedRealitySceneContent -> MainPanel -> Detailed Panel -> Function`. Follow other panel's implementation.   
 In `ControlManager`, add new items to both key and val in order, and the menu mapping will be set up.
 
-## Trigger New Events
+## Trigger new events
 To trigger an event, call `TriggerEvent(string text, int level = 0)` in `MRATManager` class. The detailed explanation is in notes.
+
+## Track more objects
+Take a look at `HandTracker.cs`. New object can be tracked as `HandJoint` type together with their names. New objects can be tracked by adding them to `handPos` in function `UpdateHandPos`.
+
+## Pack things up
+To export the package, look for `MRATPrefab` in prefab folder. Select the prefab then right click -> export. This prefab contains everything needed for the whole project.
 
 # Experimental Functions
 ## Avatar
@@ -135,3 +141,14 @@ This project is embedded with Oculus Avatar SDK and have fully functioning scrip
 
 1. Open `avatarPrefab` as prefab, set `AvatarSdkManagerHorizon` and `AvatarEntity` to active. Save prefab.
 1. In `MRATManager`, make sure the `avatarPrefab` and `useAvatar` is set to public. Then in unity inspector panel, find the `MRATManager`. Drag the Avatar prefab in Prefab folder to the `avatarPrefab`. Set the `useAvatar` to be true.
+
+# Things to Do Next
+Currently, this project is mainly completed. However, there are still something to do.
+## Clean up the code
+The code in the Unity project is still a little bit messy even though I tried my best to make them organized. 
+## Speed up the project
+The Up synching procedure will be quiet slow when hand are tracked. I believe the bottle neck of the performance is either in the scanning procedure with the hand joints as the current code find and records all child joints of the base joint recursively or in the uploading procedure due to the net bandwidth. It need further testing and optimized scanning algorithm or data structure.
+## Implement the recording replay function on web end
+Currently, the web end only supports live updates and event system. It would be better if it can support recording function.
+## Automate scene configure for the web end
+The scene configure is manually written now, which is not very elegant. One preferable way is to export the configuration directly from the Unity.
