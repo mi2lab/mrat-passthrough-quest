@@ -83,7 +83,7 @@ public class LiveDemonstrator : MonoBehaviour
         }
     }
 
-    public void UpdateItem(string id, HeadPos pos, float delta_time, bool trackHands = false, HandPos handPos = null, bool useAvatar = true)
+    public void UpdateItem(string id, HeadPos pos, float delta_time, bool trackHands = false, HandPos handPos = null, bool useAvatar = false)
     {
         if (demoDict.ContainsKey(id))
         {

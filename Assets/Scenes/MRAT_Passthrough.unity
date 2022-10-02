@@ -4482,7 +4482,7 @@ MonoBehaviour:
   - Path3D
   recordingDeltaTime: 0.1
   trackHands: 1
-  liveSyncTrackHands: 1
+  liveSyncTrackHands: 0
   targetLeftHandName: L_Hand_MRTK_Rig
   targetRightHandName: R_Hand_MRTK_Rig
   headRec: 0
@@ -4491,7 +4491,7 @@ MonoBehaviour:
   headReplay: 0
   pauseReplay: 0
   syncDatabase: 0
-  upSync: 1
+  upSync: 0
   downSync: 0
   startLogin: 0
   userNameInput: 
