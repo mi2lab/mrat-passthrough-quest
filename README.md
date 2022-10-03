@@ -10,6 +10,8 @@ MRAT-Passthrough is an user testing toolkit for Quest XR environment. This toolk
 
 [Here](https://drive.google.com/file/d/1q78PYxHeSAvvM_mLFnnSc3Esggwu8OAI/view?usp=sharing) is a short demo video of MRAT-Passthrough
 
+MRAT-Passthrough can be used with the MRAT-Passthrough dashboard, which can be found in [this repo](https://github.com/mi2lab/_quest_mrat_server).
+
 # Environment setup
 MRAT-Passthrough packages can be installed to an existing project for analysis purpose.  
 ⚠: **Please make sure** you have backup your original project before importing MRAT-Passthrough as it may interfere the original project setup. 
