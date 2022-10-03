@@ -6,7 +6,9 @@ MRAT-Passthrough is an user testing toolkit for Quest XR environment. This toolk
 - Mode switching function:
   - VR mode
   - Passthrough mode
-  - Handheld mobile mode
+  - Handheld mobile mode  
+
+[Here](https://drive.google.com/file/d/1q78PYxHeSAvvM_mLFnnSc3Esggwu8OAI/view?usp=sharing) is a short demo video of MRAT-Passthrough
 
 # Environment setup
 MRAT-Passthrough packages can be installed to an existing project for analysis purpose.  
